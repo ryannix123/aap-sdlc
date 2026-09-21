@@ -392,6 +392,61 @@ body{
   .vs-body{grid-template-columns:1fr}
   .vs-act,.vs-side,.mm,.vs-cmd{display:none}
 }
+/* ---------- domain appendix ---------- */
+.panel.dom-panel{max-width:1000px}
+.dom{display:flex;flex-direction:column;gap:14px}
+.dom-head{display:flex;align-items:baseline;gap:20px;flex-wrap:wrap}
+.dom-head h3{font-family:var(--disp);font-size:23px;font-weight:500;color:var(--ink);margin:0;letter-spacing:-.01em}
+.dom-head .meta{font-size:12.5px;color:var(--ink4)}
+.dom-head .meta code{font-family:var(--mono);font-size:12px;color:#73bcf7}
+.dom-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:14px;align-items:start}
+.dom-grid .c-write{grid-row:1 / span 2;align-self:stretch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:7px;overflow:hidden;
+  display:flex;flex-direction:column;box-shadow:0 12px 30px rgba(0,0,0,.4)}
+.card-h{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#141517;
+  border-bottom:1px solid var(--line-soft);font-size:12px;color:var(--ink3)}
+.card-h .step{font-family:var(--disp);font-weight:500;color:var(--ink);font-size:13px}
+.card-h .src{font-family:var(--mono);font-size:11px;color:var(--ink4);margin-left:auto;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.card-h .src .fi{width:auto;margin-right:5px}
+.card .code{font-size:11.8px;line-height:20px;padding:10px 12px 12px}
+.card .code .gut{width:2.2em}
+.card .ig{height:20px}
+.card .term{border-top:0;font-size:11.2px;line-height:1.62;padding:9px 12px 11px}
+.card .term .row{white-space:pre-wrap}
+.term .tp{color:#3b8eea}
+.dom .code .ln.v-good{display:none}
+.dom.st-fixed .code .ln.v-bad{display:none}
+.dom.st-fixed .code .ln.v-good{display:block;animation:vsflash 1.6s ease-out}
+.dom.st-bad .sq{text-decoration:underline wavy #f14c4c;text-decoration-thickness:1px;text-underline-offset:4px}
+.dom.st-bad .hl{background:rgba(241,76,76,.2);border-radius:2px}
+/* workflow visualizer */
+.wf{list-style:none;margin:0;padding:10px 14px 14px}
+.wf li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:10px;align-items:start;padding:6px 0;position:relative}
+.wf li::before{content:"";position:absolute;left:8px;top:-7px;height:13px;border-left:1px solid var(--line)}
+.wf li:first-child::before{display:none}
+.wf .st{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);position:relative;margin-top:1px}
+.wf li.run .st{border-color:var(--amber);border-top-color:transparent;animation:spin .7s linear infinite}
+.wf li.wait .st{border-color:var(--amber);background:#3a2e05}
+.wf li.ok .st{border-color:var(--green);background:var(--green)}
+.wf li.ok .st::after{content:"";position:absolute;left:4px;top:1px;width:4px;height:8px;
+  border:solid #fff;border-width:0 2px 2px 0;transform:rotate(43deg)}
+.wf .tx{display:flex;flex-direction:column;min-width:0}
+.wf .nm{color:var(--ink);font-size:13px}
+.wf .dt{font-family:var(--mono);font-size:11px;color:var(--ink4)}
+.wf li.wait .nm{color:var(--amber)}
+.wf .alt{display:none}
+.wf li.ok .alt{display:inline}
+.wf li.ok .pre{display:none}
+.wf li.fail{margin-top:8px;padding-left:22px}
+.wf li.fail::before{left:30px;border-left:1px dashed #c9190b;top:-9px;height:15px}
+.wf li.fail .st{border-style:dashed;border-color:#c9190b}
+.wf li.fail .nm{color:#f0736a}
+.wf li.fail.skip{opacity:.55}
+@media (max-width:860px){
+  .dom-grid{grid-template-columns:1fr}
+  .dom-grid .c-write{grid-row:auto}
+}
 </style>
 </head>
 <body>
@@ -418,7 +473,15 @@ body{
       <div class="stage-head"><span class="n">03</span> Run</div>
       <button class="substep" data-go="5">Check mode first</button>
       <button class="substep" data-go="6">Apply the change</button>
-      <button class="substep" data-go="7">The same path, four teams</button>
+      <button class="substep" data-go="7">The same path, every team</button>
+    </div>
+    <div class="stage-group" data-stage="4">
+      <div class="stage-head"><span class="n">+</span> Explore by domain</div>
+      <button class="substep" data-go="8">Network</button>
+      <button class="substep" data-go="9">Linux</button>
+      <button class="substep" data-go="10">Windows</button>
+      <button class="substep" data-go="11">Cloud</button>
+      <button class="substep" data-go="12">Database</button>
     </div>
   </nav>
 
@@ -555,26 +618,39 @@ body{
       <section class="panel" id="p7">
         <div class="win" style="padding:22px 24px">
           <table class="loop">
-            <caption>Four teams, four domains, one path</caption>
+            <caption>Six domains, one path</caption>
             <thead>
               <tr><th>Team</th><th>Owns</th><th>Approves</th><th>Runs as</th></tr>
             </thead>
             <tbody>
-              <tr><td><span class="team"><span class="swatch" style="background:#f0ab00"></span>Storage</span></td>
-                  <td><code>/storage/</code></td><td>@storage-platform</td><td>Storage job template</td></tr>
-              <tr><td><span class="team"><span class="swatch" style="background:#8476d1"></span>Network</span></td>
-                  <td><code>/network/</code></td><td>@network-eng</td><td>Network job template</td></tr>
-              <tr><td><span class="team"><span class="swatch" style="background:#009596"></span>Platforms</span></td>
-                  <td><code>/platforms/</code></td><td>@platform-ops</td><td>Platforms job template</td></tr>
-              <tr><td><span class="team"><span class="swatch" style="background:#6ca100"></span>Cloud</span></td>
-                  <td><code>/cloud/</code></td><td>@cloud-eng</td><td>Cloud job template</td></tr>
-              <tr><td class="same">Everyone</td>
-                  <td class="same">one repository</td><td class="same">one CODEOWNERS file</td>
-                  <td class="same">one execution environment</td></tr>
+              <tr><td><span class="team"><span class="swatch" style="background:#f0ab00"></span>Storage</span></td><td><code>/storage/</code></td><td>@storage-platform</td><td>Storage job template</td></tr>
+              <tr><td><span class="team"><span class="swatch" style="background:#8476d1"></span>Network</span></td><td><code>/network/</code></td><td>@network-eng</td><td>Network job template</td></tr>
+              <tr><td><span class="team"><span class="swatch" style="background:#009596"></span>Linux</span></td><td><code>/linux/</code></td><td>@linux-platform</td><td>Linux job template</td></tr>
+              <tr><td><span class="team"><span class="swatch" style="background:#2b9af3"></span>Windows</span></td><td><code>/windows/</code></td><td>@windows-platform</td><td>Windows job template</td></tr>
+              <tr><td><span class="team"><span class="swatch" style="background:#6ca100"></span>Cloud</span></td><td><code>/cloud/</code></td><td>@cloud-eng</td><td>Cloud job template</td></tr>
+              <tr><td><span class="team"><span class="swatch" style="background:#ec7a08"></span>Database</span></td><td><code>/database/</code></td><td>@dba-team</td><td>Upgrade workflow with approval</td></tr>
+              <tr><td class="same">Everyone</td><td class="same">one repository</td><td class="same">one CODEOWNERS file</td><td class="same">one execution environment</td></tr>
             </tbody>
           </table>
         </div>
       </section>
+
+      <!-- 8-12 : domain appendix -->
+      <section class="panel dom-panel" id="p8"><div data-dom="network"></div></section>
+      <section class="panel dom-panel" id="p9"><div data-dom="linux"></div></section>
+      <section class="panel dom-panel" id="p10"><div data-dom="windows"></div></section>
+      <section class="panel dom-panel" id="p11"><div data-dom="cloud"></div></section>
+      <section class="panel dom-panel" id="p12"><div data-dom="database"></div></section>
+
+      <!-- 8 : network -->
+
+      <!-- 9 : linux -->
+
+      <!-- 10 : windows -->
+
+      <!-- 11 : cloud -->
+
+      <!-- 12 : database -->
 
     </div>
 
@@ -617,9 +693,12 @@ body{
       </div>
       <div class="captext" data-cap="7">
         <h2>The same path, whoever you are</h2>
-        <p class="body">Nothing above is specific to storage. Change the directory and the owning team and the identical loop runs for network, platforms and cloud.</p>
-        <p class="body">Four teams keep their autonomy over their own domain. The organization keeps one review model, one tested content set, and one execution environment. That is the trade that usually has to be argued for, and here it falls out of the structure.</p>
+        <p class="body">Nothing above is specific to storage. Change the directory and the owning team and the identical loop runs for network, Linux, Windows, cloud and database.</p>
+        <p class="body">Each team keeps autonomy over its own domain. The organization keeps one review model, one tested content set and one execution environment. Each domain is walked through next, including the one where a dry run is not enough.</p>
       </div>
+
+      
+
     </div>
 
     <div class="nav">
@@ -810,9 +889,254 @@ body{
   };
   var hosts = document.querySelectorAll('[data-ide]');
   for (var h=0; h<hosts.length; h++) hosts[h].outerHTML = ide(CFG[hosts[h].getAttribute('data-ide')]);
+  /* ---------------- domain appendix builder ---------------- */
+  function rows(list){
+    var h='';
+    for (var i=0;i<list.length;i++) h+='<span class="row"'+(list[i][1]||'')+'>'+(list[i][0]||' ')+'</span>';
+    return h;
+  }
+  function card(cls, label, src, body){
+    return '<div class="card '+cls+'"><div class="card-h"><span class="step">'+label+'</span>'+
+           '<span class="src">'+src+'</span></div>'+body+'</div>';
+  }
+  var P='<span class="tp">$</span> <span class="cmd">', PE='</span>';
+  function note(t){ return '<span class="note">'+t+'</span>'; }
+  function tag(c,t){ return '<span class="'+c+'">'+t+'</span>'; }
+  var TSK = function(t){ return note('TASK ['+t+'] ****'); };
+
+  var DOMAINS = [
+    { key:'network', title:'Network', dir:'/network/', owner:'@network-eng', file:'network/uplinks.yml',
+      lines:[
+        [0, yd('name','Configure core uplinks')],
+        [1, y('hosts','core_switches')],
+        [1, y('gather_facts','false','yb')],
+        [1, S+'yk">tasks'+E+S+'yp">:'+E],
+        [2, yd('name','Merge uplink interface config')],
+        [3, S+'yk sq">ios_interfaces'+E+S+'yp">:'+E, 'v-bad', 6],
+        [3, S+'yk">cisco.ios.ios_interfaces'+E+S+'yp">:'+E, 'v-good', 6],
+        [4, S+'yk">config'+E+S+'yp">:'+E, '', 7],
+        [5, yd('name','GigabitEthernet1/0/48'), '', 8],
+        [6, y('description','uplink-to-dist-02'), '', 9],
+        [6, y('mtu','9198','yn'), '', 10],
+        [4, y('state','merged'), '', 11]
+      ],
+      b:{ label:'Approve', src:'ansible-lint in the pull request', start:1500, rows:[
+        [P+'ansible-lint network/'+PE],
+        [tag('fail','fqcn[action]')+note(': Use FQCN for module actions, such as cisco.ios.ios_interfaces.'), ' data-wait="700"'],
+        ['network/uplinks.yml:6 '+note('Task/Handler: Merge uplink interface config')],
+        [tag('warn','Failed: 1 failure(s), 0 warning(s) on 3 files.'), ' data-st="bad"'],
+        ['', ' data-wait="1500" data-st="fixed"'],
+        [P+'ansible-lint network/'+PE, ' data-wait="700"'],
+        [tag('pass','Passed: 0 failure(s), 0 warning(s) on 3 files.'), ' data-wait="600"']
+      ]},
+      c:{ label:'Run', src:'job 5120, check mode', start:6600, rows:[
+        [TSK('Merge uplink interface config')],
+        [tag('warn','changed: [core-sw-01]')],
+        [note('  commands:')],
+        [tag('cmd','    - interface GigabitEthernet1/0/48')],
+        [tag('cmd','    - description uplink-to-dist-02')],
+        [tag('cmd','    - mtu 9198')],
+        [''],
+        [note('PLAY RECAP  ')+tag('cmd','core-sw-01')+note(' : ok=1 ')+tag('warn','changed=1')+note(' failed=0')],
+        [note('Nothing was sent. These are the exact lines that would be.')]
+      ]},
+      cap:{ h:'Network: the exact commands, before they reach a switch', p:[
+        'Resource modules like <code>cisco.ios.ios_interfaces</code> describe the state you want rather than the commands to type. In check mode they return the precise CLI lines they would send, so the change record is the real configuration, reviewed before any device is touched.',
+        'The lint catch is small but universal: a short module name that could resolve to a different collection on another controller. Fully qualified names make a playbook mean the same thing everywhere it runs.' ]}
+    },
+    { key:'linux', title:'Linux', dir:'/linux/', owner:'@linux-platform', file:'linux/patch_web.yml',
+      lines:[
+        [0, yd('name','Patch RHEL web tier')],
+        [1, y('hosts','rhel_web')],
+        [1, y('become','true','yb')],
+        [1, y('serial','25%')],
+        [1, y('max_fail_percentage','0','yn')],
+        [1, S+'yk">tasks'+E+S+'yp">:'+E],
+        [2, yd('name','Update openssl')],
+        [3, S+'yk">ansible.builtin.dnf'+E+S+'yp">:'+E],
+        [4, y('name','openssl'), 'v-bad', 9],
+        [4, y('name','openssl-3.2.2-6.el9_5'), 'v-good', 9],
+        [4, S+'yk">state'+E+S+'yp">: '+E+S+'ys sq">latest'+E, 'v-bad', 10],
+        [4, y('state','present'), 'v-good', 10]
+      ],
+      b:{ label:'Approve', src:'ansible-lint in the pull request', start:1500, rows:[
+        [P+'ansible-lint linux/'+PE],
+        [tag('fail','package-latest')+note(': Package installs should not use latest.'), ' data-wait="700"'],
+        ['linux/patch_web.yml:8 '+note('Task/Handler: Update openssl')],
+        [tag('warn','Failed: 1 failure(s), 0 warning(s) on 2 files.'), ' data-st="bad"'],
+        ['', ' data-wait="1500" data-st="fixed"'],
+        [P+'ansible-lint linux/'+PE, ' data-wait="700"'],
+        [tag('pass','Passed: 0 failure(s), 0 warning(s) on 2 files.'), ' data-wait="600"']
+      ]},
+      c:{ label:'Run', src:'job 5131, rolling', start:6600, rows:[
+        [tag('pass','changed: [web-01]')+note('   batch 1 of 4')],
+        [tag('pass','changed: [web-02]')+note('   batch 2 of 4')],
+        [tag('pass','changed: [web-03]')+note('   batch 3 of 4')],
+        [tag('pass','changed: [web-04]')+note('   batch 4 of 4')],
+        [''],
+        [note('PLAY RECAP *****************************')],
+        [tag('cmd','web-01')+note(' : ok=2  changed=1  failed=0')],
+        [tag('cmd','web-02')+note(' : ok=2  changed=1  failed=0')],
+        [tag('cmd','web-03')+note(' : ok=2  changed=1  failed=0')],
+        [tag('cmd','web-04')+note(' : ok=2  changed=1  failed=0')]
+      ]},
+      cap:{ h:'Linux: the version you tested is the version you ship', p:[
+        '<code>state: latest</code> is the most common way a fleet drifts. Test gets Tuesday\'s openssl, production gets Thursday\'s, and nobody approved the difference. ansible-lint flags it as <code>package-latest</code>; pinning the version makes what was tested exactly what ships.',
+        '<code>serial: 25%</code> with <code>max_fail_percentage: 0</code> patches a quarter of the tier at a time and stops at the first failure, so a bad package takes out one batch instead of the whole tier.' ]}
+    },
+    { key:'windows', title:'Windows', dir:'/windows/', owner:'@windows-platform', file:'windows/iis.yml',
+      lines:[
+        [0, yd('name','Enable IIS on app servers')],
+        [1, y('hosts','win_app')],
+        [1, S+'yk">tasks'+E+S+'yp">:'+E],
+        [2, yd('name','Install IIS')],
+        [3, S+'hl">'+S+'yk">ansible.windows.win_shell'+E+S+'yp">: '+E+S+'ys">Install-WindowsFeature Web-Server'+E+E, 'v-bad', 5],
+        [3, S+'yk">ansible.windows.win_feature'+E+S+'yp">:'+E, 'v-good', 5],
+        [4, y('name','Web-Server'), 'v-good', 6],
+        [4, y('state','present'), 'v-good', 7],
+        [4, y('include_management_tools','true','yb'), 'v-good', 8]
+      ],
+      b:{ label:'Approve', src:'molecule in the pull request', start:1500, rows:[
+        [P+'molecule test -s windows'+PE],
+        [note('converge    ................ ')+tag('pass','ok'), ' data-wait="700"'],
+        [note('idempotence ................ ')+tag('fail','FAILED'), ' data-wait="500"'],
+        [note('  1 task changed on second run: Install IIS')],
+        [tag('warn','Required check failed. Merging is blocked.'), ' data-st="bad"'],
+        ['', ' data-wait="1400" data-st="fixed"'],
+        [P+'molecule test -s windows'+PE, ' data-wait="500"'],
+        [note('converge    ................ ')+tag('pass','ok'), ' data-wait="700"'],
+        [note('idempotence ................ ')+tag('pass','ok'), ' data-wait="500"'],
+        [tag('pass','All required checks passed.')]
+      ]},
+      c:{ label:'Run', src:'job 5147', start:7900, rows:[
+        [note('check mode  ')+tag('warn','changed: [win-app-01]')+note('  would install Web-Server')],
+        [note('apply       ')+tag('pass','changed: [win-app-01]')+note('  reboot_required: false')],
+        [note('re-run      ')+tag('pass','ok: [win-app-01]')+note('       already present')],
+        [''],
+        [note('The second run changed nothing. That is what idempotent means.')]
+      ]},
+      cap:{ h:'Windows: the same workflow, and the same idempotence guarantee', p:[
+        'A PowerShell one-liner installs IIS just fine, once. Run it again and it reports a change every time, which buries real changes in noise and makes check mode meaningless. Molecule runs the role twice in the pull request and fails it if the second run changes anything.',
+        '<code>ansible.windows.win_feature</code> knows whether IIS is already there. Windows administrators get the same lint, review, check mode and audit trail as the Linux team, with no separate tooling to learn or maintain.' ]}
+    },
+    { key:'cloud', title:'Cloud', dir:'/cloud/', owner:'@cloud-eng', file:'cloud/archive_bucket.yml',
+      lines:[
+        [0, yd('name','Provision archive bucket')],
+        [1, y('hosts','localhost')],
+        [1, y('gather_facts','false','yb')],
+        [1, S+'yk">tasks'+E+S+'yp">:'+E],
+        [2, yd('name','Create versioned, encrypted bucket')],
+        [3, S+'yk">amazon.aws.s3_bucket'+E+S+'yp">:'+E],
+        [4, y('name','archive-tier-prod-7f3a')],
+        [4, y('region','us-east-2')],
+        [4, S+'hl">'+S+'yk">aws_access_key'+E+S+'yp">: '+E+S+'ys">AKIAIOSFODNN7EXAMPLE'+E+E, 'v-bad', 9],
+        [4, y('encryption','AES256'), 'v-bad', 10],
+        [4, y('versioning','true','yb'), 'v-bad', 11],
+        [4, y('encryption','AES256'), 'v-good', 9],
+        [4, y('versioning','true','yb'), 'v-good', 10]
+      ],
+      b:{ label:'Approve', src:'git push', start:1500, delay:180, rows:[
+        [P+'git push origin cloud/archive-bucket'+PE],
+        [tag('fail','remote: error: GH013: Repository rule violations found for refs/heads/cloud/archive-bucket.'), ' data-wait="800"'],
+        [note('remote: - Push cannot contain secrets')],
+        [note('remote:     Amazon AWS Access Key ID')],
+        [note('remote:       locations: cloud/archive_bucket.yml:9')],
+        [tag('warn',' ! [remote rejected] cloud/archive-bucket (push declined due to repository rule violations)'), ' data-st="bad"'],
+        ['', ' data-wait="1500" data-st="fixed"'],
+        [P+'git push origin cloud/archive-bucket'+PE, ' data-wait="600"'],
+        [tag('pass',' * [new branch]      cloud/archive-bucket -> cloud/archive-bucket'), ' data-wait="600"']
+      ]},
+      c:{ label:'Run', src:'job 5188', start:6800, rows:[
+        [note('credential  ')+tag('cmd','aws-prod (Amazon Web Services)')],
+        [note('injected    ')+tag('cmd','AWS_ACCESS_KEY_ID  AWS_SECRET_ACCESS_KEY')],
+        [note('            at run time, inside the execution environment')],
+        [''],
+        [TSK('Create versioned, encrypted bucket')],
+        [tag('pass','changed: [localhost]')],
+        [note('PLAY RECAP  ')+tag('cmd','localhost')+note(' : ok=1  changed=1  failed=0')]
+      ]},
+      cap:{ h:'Cloud: engineers never hold production keys', p:[
+        'GitHub push protection rejected the branch because an access key had been pasted in to test something. Without it, that key would have lived in git history permanently, readable by anyone with access to the repository.',
+        'The fix is to remove it entirely. The job template attaches an Amazon Web Services credential that AAP injects only at run time, inside the execution environment. Rotating it means updating one credential in AAP, not chasing copies across repositories and laptops.' ]}
+    },
+    { key:'database', title:'Database', dir:'/database/', owner:'@dba-team', file:'database/preflight.yml',
+      lines:[
+        [0, yd('name','Pre-flight upgrade analysis')],
+        [1, y('hosts','ordersdb')],
+        [1, y('become','true','yb')],
+        [1, y('become_user','oracle')],
+        [1, S+'yk">tasks'+E+S+'yp">:'+E],
+        [2, yd('name','Run AutoUpgrade in analyze mode')],
+        [3, S+'yk">ansible.builtin.command'+E+S+'yp">: &gt;'+E],
+        [4, S+'ys">java -jar autoupgrade.jar'+E],
+        [4, S+'ys">-config /u01/upgrade/ordersdb.cfg -mode analyze'+E],
+        [3, y('changed_when','false','yb')],
+        [3, y('register','analyze')]
+      ],
+      b:{ label:'Pre-flight', src:'AutoUpgrade analyze mode', start:1500, delay:170, rows:[
+        [P+'java -jar autoupgrade.jar -config ordersdb.cfg -mode analyze'+PE],
+        [note('Starting AutoUpgrade execution'), ' data-wait="700"'],
+        [note('1 database will be analyzed')],
+        [note('Job 100 database ordersdb')],
+        [tag('pass','Job 100 completed'), ' data-wait="900"'],
+        [tag('cmd','Jobs finished [1]   Jobs failed [0]')],
+        [tag('pass','0 errors, 2 fixups available')]
+      ]},
+      wf:{ label:'Run', src:'workflow job 5203', base:4700, nodes:[
+        ['Analyze','AutoUpgrade -mode analyze','0:run,700:ok'],
+        ['RMAN backup','level 0','900:run,1900:ok'],
+        ['Validate backup','restore validate','2100:run,2800:ok'],
+        ['Approval','','3000:wait,5600:ok','appr'],
+        ['Upgrade','AutoUpgrade -mode deploy, restore point created','5800:run,7400:ok'],
+        ['Post-upgrade checks','invalid objects, application smoke test','7600:run,8400:ok']
+      ]},
+      cap:{ h:'Database: when a dry run can\'t tell you anything, change the controls', p:[
+        'Ansible check mode cannot meaningfully simulate an Oracle upgrade, and a demo that pretends otherwise loses the DBA in the room. So the controls change shape. AutoUpgrade\'s own analyze mode is the pre-flight, and a verified RMAN backup comes before anything irreversible.',
+        'The workflow then stops at an approval node for the DBA team. The upgrade proceeds only with a guaranteed restore point in place, and if post-upgrade checks fail, the workflow branches to flashback instead of leaving someone to improvise at 2am.' ]}
+    }
+  ];
+
+  function shiftAt(spec, base){
+    var out=[], parts=spec.split(',');
+    for (var i=0;i<parts.length;i++){ var kv=parts[i].split(':'); out.push((parseInt(kv[0],10)+base)+':'+kv[1]); }
+    return out.join(',');
+  }
+  function workflow(w){
+    var h='<ul class="wf">';
+    for (var i=0;i<w.nodes.length;i++){
+      var n=w.nodes[i], appr=n[3]==='appr';
+      var dt = appr ? '<span class="pre">awaiting '+'@dba-team'+'</span><span class="alt">approved by @dba-team</span>' : n[1];
+      h+='<li'+(appr?' class="appr"':'')+' data-at="'+shiftAt(n[2], w.base)+'"><span class="st"></span>'+
+         '<span class="tx"><span class="nm">'+n[0]+'</span><span class="dt">'+dt+'</span></span></li>';
+    }
+    h+='<li class="fail" data-at="'+(w.base+8600)+':skip"><span class="st"></span><span class="tx">'+
+       '<span class="nm">Flashback to guaranteed restore point</span>'+
+       '<span class="dt">runs only if the upgrade or its checks fail</span></span></li></ul>';
+    return h;
+  }
+  function domPanel(d){
+    var code='<pre class="code reveal" data-delay="110">'+codeLines(d.lines,2)+'</pre>';
+    var b='<div class="term" data-seq="row" data-delay="'+(d.b.delay||200)+'" data-start="'+d.b.start+'">'+rows(d.b.rows)+'</div>';
+    var cl = d.wf ? d.wf : d.c;
+    var c = d.wf ? workflow(d.wf)
+      : '<div class="term" data-seq="row" data-delay="'+(d.c.delay||190)+'" data-start="'+d.c.start+'">'+rows(d.c.rows)+'</div>';
+    return '<div class="dom" data-st-init="clean" data-err-init="0">'+
+      '<div class="dom-head"><h3>'+d.title+'</h3><span class="meta">owns <code>'+d.dir+'</code></span>'+
+      '<span class="meta">approved by <code>'+d.owner+'</code></span></div>'+
+      '<div class="dom-grid">'+card('c-write','Write',fic('yaml')+d.file,code)+
+      card('c-b',d.b.label,d.b.src,b)+card('c-c',cl.label,cl.src,c)+'</div></div>';
+  }
+  var capBox = document.querySelector('.caption');
+  for (var di=0; di<DOMAINS.length; di++){
+    var dd = DOMAINS[di];
+    var host = document.querySelector('[data-dom="'+dd.key+'"]');
+    if (host) host.outerHTML = domPanel(dd);
+    var ph=''; for (var pi=0; pi<dd.cap.p.length; pi++) ph+='<p class="body">'+dd.cap.p[pi]+'</p>';
+    capBox.insertAdjacentHTML('beforeend','<div class="captext" data-cap="'+(8+di)+'"><h2>'+dd.cap.h+'</h2>'+ph+'</div>');
+  }
 
   /* ---------------- step engine ---------------- */
-  var TOTAL = 8, cur = -1, timers = [];
+  var TOTAL = 13, MAIN = 8, cur = -1, timers = [];
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var panels = [];
   for (var i = 0; i < TOTAL; i++) panels.push(document.getElementById('p' + i));
@@ -828,7 +1152,7 @@ body{
     for (var j = 0; j < b.length; j++){ b[j].textContent = v; b[j].classList.toggle('zero', v === '0'); }
   }
   function setState(p, s){
-    var v = p.querySelector('.vsc'); if (!v) return;
+    var v = p.querySelector('[data-st-init]'); if (!v) return;
     v.classList.remove('st-clean', 'st-bad', 'st-fixed'); v.classList.add('st-' + s);
   }
 
@@ -842,7 +1166,9 @@ body{
       var cs = cw.querySelectorAll('.check');
       for (var j = 0; j < cs.length; j++){ cs[j].classList.remove('run'); cs[j].classList.remove('ok'); }
     }
-    var v = p.querySelector('.vsc');
+    var at = p.querySelectorAll('[data-at]');
+    for (var q = 0; q < at.length; q++) at[q].classList.remove('run','ok','wait','skip');
+    var v = p.querySelector('[data-st-init]');
     if (v){ setState(p, v.getAttribute('data-st-init')); setErr(p, v.getAttribute('data-err-init')); }
   }
 
@@ -850,7 +1176,10 @@ body{
     var code = p.querySelector('.reveal');
     if (code){
       var delay = parseInt(code.getAttribute('data-delay'), 10) || 120;
-      var lns = code.querySelectorAll('.ln'), mms = p.querySelectorAll('.mm i');
+      var all = code.querySelectorAll('.ln'), mms = p.querySelectorAll('.mm i'), lns = [];
+      for (var a = 0; a < all.length; a++){
+        if (all[a].classList.contains('v-good')) all[a].classList.add('in'); else lns.push(all[a]);
+      }
       for (var i = 0; i < lns.length; i++){
         (function(el, n){
           later(function(){
@@ -863,19 +1192,31 @@ body{
         })(lns[i], i);
       }
     }
-    var term = p.querySelector('.term[data-seq]');
-    if (term){
+    var terms = p.querySelectorAll('.term[data-seq]');
+    for (var tq = 0; tq < terms.length; tq++){
+      var term = terms[tq];
       var td = parseInt(term.getAttribute('data-delay'), 10) || 150;
-      var rows = term.querySelectorAll('.row'), t = 0;
-      for (var r = 0; r < rows.length; r++){
-        t += (r ? td : 0) + (parseInt(rows[r].getAttribute('data-wait'), 10) || 0);
+      var rws = term.querySelectorAll('.row'), t = parseInt(term.getAttribute('data-start'), 10) || 0;
+      for (var r = 0; r < rws.length; r++){
+        t += (r ? td : 0) + (parseInt(rws[r].getAttribute('data-wait'), 10) || 0);
         (function(el, at){
           later(function(){
             el.classList.add('in');
             if (el.hasAttribute('data-err')) setErr(p, el.getAttribute('data-err'));
             if (el.hasAttribute('data-st')) setState(p, el.getAttribute('data-st'));
           }, reduce ? 0 : at);
-        })(rows[r], t);
+        })(rws[r], t);
+      }
+    }
+    var tl = p.querySelectorAll('[data-at]');
+    for (var z = 0; z < tl.length; z++){
+      var steps = tl[z].getAttribute('data-at').split(',');
+      for (var zz = 0; zz < steps.length; zz++){
+        var kv = steps[zz].split(':');
+        (function(el, cls){
+          later(function(){ el.classList.remove('run','ok','wait','skip'); el.classList.add(cls); },
+                reduce ? 0 : parseInt(kv[0], 10));
+        })(tl[z], kv[1]);
       }
     }
     var cw = p.querySelector('.checks[data-seq]');
@@ -906,14 +1247,14 @@ body{
       subs[i].classList.toggle('done', i < cur);
     }
     var groups = document.querySelectorAll('.stage-group');
-    var stage = cur <= 2 ? 1 : (cur <= 4 ? 2 : 3);
+    var stage = cur <= 2 ? 1 : (cur <= 4 ? 2 : (cur <= 7 ? 3 : 4));
     for (var g = 0; g < groups.length; g++)
       groups[g].classList.toggle('on', parseInt(groups[g].getAttribute('data-stage'), 10) === stage);
-    document.getElementById('count').textContent = (cur + 1) + ' / ' + TOTAL;
+    document.getElementById('count').textContent = cur < MAIN ? (cur + 1) + ' / ' + MAIN : 'Domain ' + (cur - MAIN + 1) + ' of ' + (TOTAL - MAIN);
     document.getElementById('prev').disabled = (cur === 0);
     var nx = document.getElementById('next');
     nx.disabled = (cur === TOTAL - 1);
-    nx.textContent = (cur === TOTAL - 1) ? 'End' : 'Next';
+    nx.textContent = (cur === MAIN - 1) ? 'Explore by domain' : ((cur === TOTAL - 1) ? 'End' : 'Next');
   }
 
   for (var s = 0; s < subs.length; s++){
