@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>From workspace to production</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700&family=Red+Hat+Mono:wght@400;500&family=Red+Hat+Text:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#151515; --surface:#1b1b1d; --surface2:#212427; --surface3:#26292d;
+  --line:#3c3f42; --line-soft:#2b2e31;
+  --ink:#ffffff; --ink2:#c9cbcd; --ink3:#8a8d90; --ink4:#6a6e73;
+  --red:#ee0000; --red-deep:#8a0000;
+  --green:#3e8635; --green-lit:#63b359;
+  --amber:#f0ab00; --blue:#2b9af3; --violet:#8476d1; --cyan:#009596;
+  --mono:'Red Hat Mono',ui-monospace,Menlo,Consolas,monospace;
+  --sans:'Red Hat Text',system-ui,-apple-system,sans-serif;
+  --disp:'Red Hat Display','Red Hat Text',system-ui,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#151515; } }
+:root[data-theme="dark"]{ --bg:#151515; }
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+body{
+  margin:0;height:100%;background:var(--bg);color:var(--ink2);
+  font-family:var(--sans);font-size:15px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.app{height:100%;display:grid;grid-template-columns:248px minmax(0,1fr);}
+
+/* ---------- rail ---------- */
+.rail{
+  border-right:1px solid var(--line-soft);padding:26px 20px 20px;
+  display:flex;flex-direction:column;gap:26px;overflow-y:auto;background:#121212;
+}
+.brand{display:flex;flex-direction:column;gap:5px}
+.brand h1{
+  font-family:var(--disp);font-weight:700;font-size:17px;line-height:1.2;
+  color:var(--ink);margin:0;letter-spacing:-.01em;
+}
+.brand p{margin:0;font-size:12.5px;color:var(--ink4);line-height:1.45}
+.stage-group{display:flex;flex-direction:column;gap:3px}
+.stage-head{
+  display:flex;align-items:baseline;gap:9px;padding:3px 0 7px;
+  font-family:var(--disp);font-weight:500;font-size:13.5px;color:var(--ink3);
+}
+.stage-head .n{
+  font-family:var(--mono);font-size:11px;color:var(--ink4);
+  border:1px solid var(--line);border-radius:3px;padding:1px 5px;
+}
+.stage-group.on .stage-head{color:var(--ink)}
+.stage-group.on .stage-head .n{color:var(--red);border-color:var(--red-deep)}
+.substep{
+  appearance:none;background:none;border:0;text-align:left;cursor:pointer;
+  font:inherit;font-size:13px;color:var(--ink4);padding:6px 10px 6px 13px;
+  border-left:2px solid var(--line-soft);border-radius:0 4px 4px 0;width:100%;
+  transition:color .16s,border-color .16s,background .16s;
+}
+.substep:hover{color:var(--ink2);background:#191919}
+.substep.on{color:var(--ink);border-left-color:var(--red);background:#1d1a1a}
+.substep.done{color:var(--ink3)}
+.substep:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+
+/* ---------- main ---------- */
+.main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.stagewrap{
+  flex:1;min-height:0;padding:26px 30px 14px;display:flex;
+  align-items:center;justify-content:center;overflow:auto;
+}
+.panel{display:none;width:100%;max-width:880px}
+.panel.on{display:block}
+
+/* ---------- generic chrome ---------- */
+.win{
+  background:var(--surface);border:1px solid var(--line);border-radius:7px;
+  overflow:hidden;box-shadow:0 18px 44px rgba(0,0,0,.5);
+}
+.titlebar{
+  display:flex;align-items:center;gap:9px;padding:9px 12px;
+  background:#121315;border-bottom:1px solid var(--line-soft);
+}
+.dot{width:10px;height:10px;border-radius:50%;background:#3a3d40;flex:none}
+.urlpill{
+  flex:1;background:#0e0f10;border:1px solid var(--line-soft);border-radius:5px;
+  padding:4px 11px;font-family:var(--mono);font-size:11.5px;color:var(--ink3);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ide{display:grid;grid-template-columns:186px minmax(0,1fr);min-height:326px}
+.files{background:#161719;border-right:1px solid var(--line-soft);padding:11px 0}
+.files .repo{
+  font-size:11.5px;color:var(--ink3);padding:0 13px 9px;
+  font-family:var(--mono);letter-spacing:.01em;
+}
+.files ul{list-style:none;margin:0;padding:0}
+.files li{
+  font-family:var(--mono);font-size:11.5px;color:var(--ink3);
+  padding:3.5px 13px 3.5px 22px;white-space:nowrap;
+}
+.files li.sel{background:#232427;color:var(--ink);border-left:2px solid var(--red);padding-left:20px}
+.editor{display:flex;flex-direction:column;min-width:0}
+.tabs{display:flex;background:#141517;border-bottom:1px solid var(--line-soft)}
+.tab{
+  font-family:var(--mono);font-size:11.5px;color:var(--ink4);
+  padding:8px 15px;border-right:1px solid var(--line-soft);
+  transition:background .2s,color .2s;white-space:nowrap;
+}
+.tab.on{background:var(--surface);color:var(--ink);box-shadow:inset 0 -2px 0 var(--red)}
+.code{
+  margin:0;padding:13px 15px;font-family:var(--mono);font-size:12.5px;
+  line-height:1.72;overflow-x:auto;flex:1;
+}
+.code .ln{display:block;white-space:pre;color:var(--ink2)}
+.reveal .ln{opacity:0;transform:translateY(2px)}
+.reveal .ln.in{opacity:1;transform:none;transition:opacity .16s ease,transform .16s ease}
+.k{color:#73bcf7}.s{color:#f4b678}.p{color:var(--ink4)}.c{color:#a2d9a2}
+.gut{color:var(--ink4);display:inline-block;width:1.9em;user-select:none}
+.caret{
+  display:inline-block;width:7px;height:1em;background:var(--red);
+  vertical-align:-2px;animation:blink 1.05s step-end infinite;
+}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- terminal ---------- */
+.term{
+  border-top:1px solid var(--line);background:#0e0f10;padding:11px 15px 13px;
+  font-family:var(--mono);font-size:12px;line-height:1.66;overflow-x:auto;
+}
+.term .row{display:block;white-space:pre;color:var(--ink3);opacity:0}
+.term .row.in{opacity:1;transition:opacity .13s}
+.term .cmd{color:var(--ink)}
+.term .fail{color:#f0736a}.term .pass{color:var(--green-lit)}
+.term .warn{color:var(--amber)}.term .note{color:var(--ink4)}
+.term .rule{color:#73bcf7}
+
+/* ---------- pull request ---------- */
+.pr{padding:0}
+.prhead{padding:16px 20px 14px;border-bottom:1px solid var(--line-soft)}
+.prtitle{
+  font-family:var(--disp);font-size:19px;font-weight:500;color:var(--ink);
+  margin:0 0 9px;letter-spacing:-.01em;
+}
+.prmeta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:12.5px;color:var(--ink4)}
+.pill{
+  border-radius:11px;padding:2px 10px;font-size:11.5px;font-family:var(--sans);
+  border:1px solid var(--line);color:var(--ink3);
+}
+.pill.open{background:#1d3a23;border-color:#2c5c33;color:#8ed48a}
+.pill.merged{background:#2b2244;border-color:#453a6b;color:#b9a9f0}
+.branch{font-family:var(--mono);font-size:11.5px;color:var(--ink3)}
+.checks{padding:6px 20px 10px}
+.check{
+  display:flex;align-items:center;gap:11px;padding:9px 0;
+  border-bottom:1px solid var(--line-soft);font-size:13.5px;
+}
+.check:last-child{border-bottom:0}
+.ic{
+  width:16px;height:16px;border-radius:50%;flex:none;position:relative;
+  border:2px solid var(--line);
+}
+.check.run .ic{border-color:var(--amber);border-top-color:transparent;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.check.ok .ic{border-color:var(--green);background:var(--green)}
+.check.ok .ic::after{
+  content:"";position:absolute;left:4px;top:1px;width:4px;height:8px;
+  border:solid #fff;border-width:0 2px 2px 0;transform:rotate(43deg);
+}
+.check .nm{color:var(--ink);flex:1;min-width:0}
+.check .dur{font-family:var(--mono);font-size:11.5px;color:var(--ink4)}
+.check .det{font-size:12.5px;color:var(--ink4)}
+.gate{
+  margin:4px 20px 18px;border:1px solid var(--line);border-radius:6px;
+  background:var(--surface2);padding:14px 16px;
+}
+.gate.armed{border-color:#2c5c33;background:#17251a}
+.gate h4{
+  margin:0 0 7px;font-family:var(--disp);font-size:14px;font-weight:500;color:var(--ink);
+}
+.gate p{margin:0;font-size:13px;color:var(--ink3)}
+.gate code{font-family:var(--mono);font-size:12px;color:#73bcf7}
+.owners{margin-top:11px;display:flex;align-items:center;gap:9px;font-size:13px}
+.avatar{
+  width:23px;height:23px;border-radius:50%;flex:none;
+  background:linear-gradient(145deg,#4d5257,#2e3235);
+  display:grid;place-items:center;font-size:10px;color:var(--ink2);
+  font-family:var(--mono);
+}
+.avatar.ok{background:linear-gradient(145deg,#3e8635,#2a5e24);color:#fff}
+.mergebar{
+  border-top:1px solid var(--line-soft);padding:14px 20px;
+  display:flex;align-items:center;gap:13px;
+}
+.btn{
+  font-family:var(--sans);font-size:13.5px;border-radius:5px;
+  padding:7px 16px;border:1px solid var(--line);color:var(--ink4);background:var(--surface2);
+}
+.btn.live{background:var(--green);border-color:var(--green);color:#fff}
+.btn.done{background:#2b2244;border-color:#453a6b;color:#b9a9f0}
+.mergebar .hint{font-size:12.5px;color:var(--ink4)}
+
+/* ---------- AAP ---------- */
+.jobhead{
+  display:flex;align-items:center;gap:13px;padding:14px 18px;
+  border-bottom:1px solid var(--line-soft);background:#161719;flex-wrap:wrap;
+}
+.jobhead .nm{font-family:var(--disp);font-size:15px;color:var(--ink);font-weight:500}
+.jobhead .id{font-family:var(--mono);font-size:11.5px;color:var(--ink4)}
+.banner{
+  padding:9px 18px;font-size:13px;display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid var(--line-soft);
+}
+.banner.check{background:#2e2408;color:var(--amber)}
+.banner.applied{background:#17251a;color:var(--green-lit)}
+.banner b{font-weight:500}
+
+/* ---------- loop table ---------- */
+.loop{width:100%;border-collapse:collapse;font-size:13px}
+.loop caption{
+  caption-side:top;text-align:left;font-family:var(--disp);font-size:16px;
+  color:var(--ink);padding:0 0 13px;font-weight:500;
+}
+.loop th{
+  text-align:left;font-weight:500;font-size:11.5px;color:var(--ink4);
+  padding:0 14px 9px 0;border-bottom:1px solid var(--line);
+}
+.loop td{
+  padding:11px 14px 11px 0;border-bottom:1px solid var(--line-soft);
+  color:var(--ink2);vertical-align:middle;
+}
+.loop tr:last-child td{border-bottom:0}
+.loop .team{color:var(--ink);display:flex;align-items:center;gap:9px}
+.swatch{width:9px;height:9px;border-radius:2px;flex:none}
+.loop code{font-family:var(--mono);font-size:12px;color:#73bcf7}
+.loop .same{color:var(--ink4);font-size:12.5px}
+
+/* ---------- caption ---------- */
+.caption{
+  border-top:1px solid var(--line-soft);padding:17px 30px 14px;
+  min-height:132px;background:#121212;
+}
+.caption h2{
+  font-family:var(--disp);font-size:17px;font-weight:500;color:var(--ink);
+  margin:0 0 7px;letter-spacing:-.01em;
+}
+.caption .body{max-width:74ch;font-size:14px;color:var(--ink2);margin:0}
+.caption .body + .body{margin-top:8px}
+.caption .body strong{color:var(--ink);font-weight:500}
+.caption .body code{font-family:var(--mono);font-size:12.5px;color:#f4b678}
+.captext{display:none}
+.captext.on{display:block}
+
+/* ---------- nav ---------- */
+.nav{
+  display:flex;align-items:center;gap:13px;padding:0 30px 18px;background:#121212;
+}
+.navbtn{
+  appearance:none;font:inherit;font-size:13.5px;cursor:pointer;
+  background:var(--surface2);border:1px solid var(--line);color:var(--ink2);
+  border-radius:5px;padding:7px 17px;transition:border-color .15s,color .15s;
+}
+.navbtn:hover:not(:disabled){border-color:var(--ink4);color:var(--ink)}
+.navbtn:disabled{opacity:.34;cursor:default}
+.navbtn.primary{background:var(--red);border-color:var(--red);color:#fff}
+.navbtn.primary:hover{border-color:#ff3232;color:#fff}
+.navbtn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.count{font-family:var(--mono);font-size:12px;color:var(--ink4);margin-left:auto}
+.kbd{font-family:var(--mono);font-size:11px;color:var(--ink4)}
+.kbd b{
+  border:1px solid var(--line);border-radius:3px;padding:1px 5px;
+  color:var(--ink3);font-weight:400;
+}
+
+@media (max-width:860px){
+  .app{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}
+  .rail{
+    border-right:0;border-bottom:1px solid var(--line-soft);
+    flex-direction:row;gap:16px;overflow-x:auto;padding:13px 16px;align-items:center;
+  }
+  .brand{display:none}
+  .stage-group{flex-direction:row;align-items:center;gap:7px}
+  .stage-head{padding:0}
+  .substep{width:auto;white-space:nowrap;border-left:0;border-bottom:2px solid var(--line-soft);border-radius:0}
+  .substep.on{border-left:0;border-bottom-color:var(--red)}
+  .stagewrap{padding:16px}
+  .caption{padding:14px 16px 10px;min-height:0}
+  .nav{padding:0 16px 14px}
+  .ide{grid-template-columns:1fr}
+  .files{display:none}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms!important;transition-duration:.001ms!important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <nav class="rail" aria-label="Steps">
+    <div class="brand">
+      <h1>From workspace to production</h1>
+      <p>How one automation change reaches the storage estate</p>
+    </div>
+
+    <div class="stage-group" data-stage="1">
+      <div class="stage-head"><span class="n">01</span> Write</div>
+      <button class="substep" data-go="0">Open the workspace</button>
+      <button class="substep" data-go="1">Write the playbook</button>
+      <button class="substep" data-go="2">Lint before commit</button>
+    </div>
+    <div class="stage-group" data-stage="2">
+      <div class="stage-head"><span class="n">02</span> Approve</div>
+      <button class="substep" data-go="3">Open the pull request</button>
+      <button class="substep" data-go="4">The directory owner reviews</button>
+    </div>
+    <div class="stage-group" data-stage="3">
+      <div class="stage-head"><span class="n">03</span> Run</div>
+      <button class="substep" data-go="5">Check mode first</button>
+      <button class="substep" data-go="6">Apply the change</button>
+      <button class="substep" data-go="7">The same path, four teams</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="stagewrap">
+
+      <!-- 0 : workspace -->
+      <section class="panel" id="p0">
+        <div class="win">
+          <div class="titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="urlpill">devspaces.apps.rm2.thpm.p1.openshiftapps.com</span>
+          </div>
+          <div class="ide">
+            <div class="files">
+              <div class="repo">ansible-devspaces-demo</div>
+              <ul>
+                <li>.vscode/</li><li class="sel">extensions.json</li><li>settings.json</li>
+                <li>collections/</li><li>.ansible-lint</li><li>.pre-commit-config.yaml</li>
+                <li>.yamllint</li><li>devfile.yaml</li><li>README.md</li>
+              </ul>
+            </div>
+            <div class="editor">
+              <div class="tabs"><span class="tab on">extensions.json</span></div>
+              <pre class="code reveal" data-seq="line" data-delay="90"><span class="ln"><span class="gut">1</span><span class="p">{</span></span><span class="ln"><span class="gut">2</span>  <span class="k">"recommendations"</span><span class="p">: [</span></span><span class="ln"><span class="gut">3</span>    <span class="s">"ms-python.python"</span><span class="p">,</span></span><span class="ln"><span class="gut">4</span>    <span class="s">"redhat.ansible"</span><span class="p">,</span></span><span class="ln"><span class="gut">5</span>    <span class="s">"redhat.vscode-openshift-connector"</span><span class="p">,</span></span><span class="ln"><span class="gut">6</span>    <span class="s">"ms-python.black-formatter"</span></span><span class="ln"><span class="gut">7</span>  <span class="p">]</span></span><span class="ln"><span class="gut">8</span><span class="p">}</span></span></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 1 : playbook -->
+      <section class="panel" id="p1">
+        <div class="win">
+          <div class="titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="urlpill">devspaces.apps.rm2.thpm.p1.openshiftapps.com</span>
+          </div>
+          <div class="ide">
+            <div class="files">
+              <div class="repo">ansible-devspaces-demo</div>
+              <ul>
+                <li>collections/</li><li>roles/</li>
+                <li class="sel">storage/playbook.yml</li>
+                <li>network/</li><li>platforms/</li><li>cloud/</li>
+                <li>.ansible-lint</li><li>devfile.yaml</li>
+              </ul>
+            </div>
+            <div class="editor">
+              <div class="tabs">
+                <span class="tab">extensions.json</span><span class="tab on">playbook.yml</span>
+              </div>
+              <pre class="code reveal" data-seq="line" data-delay="170" data-caret="1"><span class="ln"><span class="gut">1</span><span class="p">---</span></span><span class="ln"><span class="gut">2</span><span class="p">- </span><span class="k">name</span><span class="p">:</span> <span class="s">Provision ONTAP volume</span></span><span class="ln"><span class="gut">3</span>  <span class="k">hosts</span><span class="p">:</span> <span class="s">storage</span></span><span class="ln"><span class="gut">4</span>  <span class="k">gather_facts</span><span class="p">:</span> <span class="s">false</span></span><span class="ln"><span class="gut">5</span>  <span class="k">roles</span><span class="p">:</span></span><span class="ln"><span class="gut">6</span>    <span class="p">- </span><span class="k">role</span><span class="p">:</span> <span class="s">provision_ontap_volume</span></span><span class="ln"><span class="gut">7</span>      <span class="k">vars</span><span class="p">:</span></span><span class="ln"><span class="gut">8</span>        <span class="k">volume_size_gb</span><span class="p">:</span> <span class="s">500</span></span><span class="ln"><span class="gut">9</span>        <span class="k">export_policy</span><span class="p">:</span> <span class="s">prod</span></span></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2 : lint -->
+      <section class="panel" id="p2">
+        <div class="win">
+          <div class="titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="urlpill">devspaces.apps.rm2.thpm.p1.openshiftapps.com</span>
+          </div>
+          <div class="ide" style="min-height:150px">
+            <div class="files">
+              <div class="repo">ansible-devspaces-demo</div>
+              <ul>
+                <li class="sel">storage/playbook.yml</li><li>.ansible-lint</li>
+                <li>.pre-commit-config.yaml</li><li>devfile.yaml</li>
+              </ul>
+            </div>
+            <div class="editor">
+              <div class="tabs"><span class="tab on">playbook.yml</span></div>
+              <pre class="code"><span class="ln"><span class="gut">6</span>    <span class="p">- </span><span class="k">role</span><span class="p">:</span> <span class="s">provision_ontap_volume</span></span><span class="ln"><span class="gut">7</span>      <span class="k">vars</span><span class="p">:</span></span><span class="ln"><span class="gut">8</span>        <span class="k">volume_size_gb</span><span class="p">:</span> <span class="s">500</span></span></pre>
+            </div>
+          </div>
+          <div class="term" data-seq="row" data-delay="210">
+            <span class="row"><span class="cmd">$ ansible-lint storage/playbook.yml</span></span>
+            <span class="row"> </span>
+            <span class="row"><span class="fail">fqcn[action-core]</span>  <span class="note">storage/playbook.yml:12</span></span>
+            <span class="row"><span class="note">  Use FQCN for builtin module actions — </span><span class="rule">command</span><span class="note"> → </span><span class="rule">ansible.builtin.command</span></span>
+            <span class="row"><span class="fail">no-changed-when</span>  <span class="note">storage/playbook.yml:12</span></span>
+            <span class="row"><span class="note">  Commands should not change things if nothing needs doing</span></span>
+            <span class="row"><span class="fail">risky-file-permissions</span>  <span class="note">roles/provision_ontap_volume/tasks/main.yml:24</span></span>
+            <span class="row"><span class="note">  File permissions unset or incorrect</span></span>
+            <span class="row"> </span>
+            <span class="row"><span class="warn">Failed: 3 failure(s) — profile: production</span></span>
+            <span class="row"> </span>
+            <span class="row"><span class="cmd">$ ansible-lint storage/playbook.yml</span></span>
+            <span class="row"><span class="pass">Passed: 0 failure(s), 0 warning(s) — profile: production</span></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3 : PR checks -->
+      <section class="panel" id="p3">
+        <div class="win pr">
+          <div class="prhead">
+            <h3 class="prtitle">Provision ONTAP volume for archive tier</h3>
+            <div class="prmeta">
+              <span class="pill open">Open</span>
+              <span class="branch">storage/ontap-archive-tier → main</span>
+              <span>3 files changed</span>
+            </div>
+          </div>
+          <div class="checks" data-seq="check" data-delay="700">
+            <div class="check"><span class="ic"></span><span class="nm">yamllint</span><span class="dur">6s</span></div>
+            <div class="check"><span class="ic"></span><span class="nm">ansible-lint (production profile)</span><span class="dur">24s</span></div>
+            <div class="check"><span class="ic"></span><span class="nm">molecule — converge and idempotence</span><span class="dur">2m 11s</span></div>
+            <div class="check"><span class="ic"></span><span class="nm">execution environment parity</span><span class="dur">9s</span></div>
+          </div>
+          <div class="gate">
+            <h4>Review required</h4>
+            <p>Changes touch <code>storage/</code>, so <code>CODEOWNERS</code> requires approval from the team that owns that directory.</p>
+            <div class="owners">
+              <span class="avatar">DS</span>
+              <span>Awaiting review from <strong style="color:var(--ink);font-weight:500">@storage-platform</strong></span>
+            </div>
+          </div>
+          <div class="mergebar">
+            <span class="btn">Merge pull request</span>
+            <span class="hint">Blocked until required review is met</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4 : approved -->
+      <section class="panel" id="p4">
+        <div class="win pr">
+          <div class="prhead">
+            <h3 class="prtitle">Provision ONTAP volume for archive tier</h3>
+            <div class="prmeta">
+              <span class="pill merged">Merged</span>
+              <span class="branch">storage/ontap-archive-tier → main</span>
+              <span>3 files changed</span>
+            </div>
+          </div>
+          <div class="checks">
+            <div class="check ok"><span class="ic"></span><span class="nm">All checks have passed</span><span class="det">4 successful</span></div>
+          </div>
+          <div class="gate armed">
+            <h4>Approved by the directory owner</h4>
+            <p>One line in <code>CODEOWNERS</code> did this: <code>/storage/ @storage-platform</code></p>
+            <div class="owners">
+              <span class="avatar ok">✓</span>
+              <span><strong style="color:var(--ink);font-weight:500">@storage-platform</strong> approved these changes</span>
+            </div>
+          </div>
+          <div class="mergebar">
+            <span class="btn done">Merged</span>
+            <span class="hint">main is now the only source AAP will run from</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5 : check mode -->
+      <section class="panel" id="p5">
+        <div class="win">
+          <div class="jobhead">
+            <span class="nm">Storage — Provision ONTAP volume</span>
+            <span class="id">job 4412</span>
+            <span class="pill">check mode</span>
+          </div>
+          <div class="banner check">
+            <b>Check mode.</b> Ansible reports what it would change and writes nothing.
+          </div>
+          <div class="term" data-seq="row" data-delay="190">
+            <span class="row"><span class="note">PLAY [Provision ONTAP volume] ******************************</span></span>
+            <span class="row"> </span>
+            <span class="row"><span class="note">TASK [provision_ontap_volume : check aggregate capacity] ***</span></span>
+            <span class="row"><span class="pass">ok: [na-ctrl-01]</span></span>
+            <span class="row"><span class="note">TASK [provision_ontap_volume : create volume] **************</span></span>
+            <span class="row"><span class="warn">changed: [na-ctrl-01]</span>  <span class="note">would create vol_archive_tier (500 GB)</span></span>
+            <span class="row"><span class="note">TASK [provision_ontap_volume : set export policy] **********</span></span>
+            <span class="row"><span class="warn">changed: [na-ctrl-01]</span>  <span class="note">would set export_policy=prod</span></span>
+            <span class="row"> </span>
+            <span class="row"><span class="note">PLAY RECAP *************************************************</span></span>
+            <span class="row"><span class="cmd">na-ctrl-01</span><span class="note">  : ok=3  </span><span class="warn">changed=2</span><span class="note">  unreachable=0  failed=0</span></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6 : apply -->
+      <section class="panel" id="p6">
+        <div class="win">
+          <div class="jobhead">
+            <span class="nm">Storage — Provision ONTAP volume</span>
+            <span class="id">job 4413</span>
+            <span class="pill">apply</span>
+          </div>
+          <div class="banner applied">
+            <b>Successful.</b> Ran from main, in the execution environment the workspace used.
+          </div>
+          <div class="term" data-seq="row" data-delay="190">
+            <span class="row"><span class="note">PLAY [Provision ONTAP volume] ******************************</span></span>
+            <span class="row"> </span>
+            <span class="row"><span class="note">TASK [provision_ontap_volume : check aggregate capacity] ***</span></span>
+            <span class="row"><span class="pass">ok: [na-ctrl-01]</span></span>
+            <span class="row"><span class="note">TASK [provision_ontap_volume : create volume] **************</span></span>
+            <span class="row"><span class="pass">changed: [na-ctrl-01]</span></span>
+            <span class="row"><span class="note">TASK [provision_ontap_volume : set export policy] **********</span></span>
+            <span class="row"><span class="pass">changed: [na-ctrl-01]</span></span>
+            <span class="row"> </span>
+            <span class="row"><span class="note">PLAY RECAP *************************************************</span></span>
+            <span class="row"><span class="cmd">na-ctrl-01</span><span class="note">  : ok=3  </span><span class="pass">changed=2</span><span class="note">  unreachable=0  failed=0</span></span>
+            <span class="row"> </span>
+            <span class="row"><span class="note">Identical to the check-mode run. No surprises at 2am.</span></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7 : the loop -->
+      <section class="panel" id="p7">
+        <div class="win" style="padding:22px 24px">
+          <table class="loop">
+            <caption>Four teams, four domains, one path</caption>
+            <thead>
+              <tr><th>Team</th><th>Owns</th><th>Approves</th><th>Runs as</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="team"><span class="swatch" style="background:#f0ab00"></span>Storage</span></td>
+                  <td><code>/storage/</code></td><td>@storage-platform</td><td>Storage job template</td></tr>
+              <tr><td><span class="team"><span class="swatch" style="background:#8476d1"></span>Network</span></td>
+                  <td><code>/network/</code></td><td>@network-eng</td><td>Network job template</td></tr>
+              <tr><td><span class="team"><span class="swatch" style="background:#009596"></span>Platforms</span></td>
+                  <td><code>/platforms/</code></td><td>@platform-ops</td><td>Platforms job template</td></tr>
+              <tr><td><span class="team"><span class="swatch" style="background:#6ca100"></span>Cloud</span></td>
+                  <td><code>/cloud/</code></td><td>@cloud-eng</td><td>Cloud job template</td></tr>
+              <tr><td class="same">Everyone</td>
+                  <td class="same">one repository</td><td class="same">one CODEOWNERS file</td>
+                  <td class="same">one execution environment</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="caption" aria-live="polite">
+      <div class="captext" data-cap="0">
+        <h2>One URL, and the environment is already correct</h2>
+        <p class="body">No laptop setup, no version drift, no "works on mine." The workspace ships from the repository, so every engineer who opens it gets the same editor, the same tooling and the same approved extensions.</p>
+        <p class="body"><code>redhat.ansible</code> brings the Ansible language server and inline lint. <code>redhat.vscode-openshift-connector</code> brings cluster access. Nobody installs anything, and nobody can quietly drift.</p>
+      </div>
+      <div class="captext" data-cap="1">
+        <h2>The engineer writes the automation, and nothing else</h2>
+        <p class="body">A role from the shared collection, the two variables that make this change specific, and that is the whole file. The engineer is writing intent, not plumbing.</p>
+        <p class="body">The same <code>devfile.yaml</code> that built this workspace pins the execution environment image that Ansible Automation Platform will run with later. That is what closes the gap between here and production.</p>
+      </div>
+      <div class="captext" data-cap="2">
+        <h2>ansible-lint reviews the change before a person has to</h2>
+        <p class="body"><strong>What it does:</strong> checks the playbook against a rule set for deprecated syntax, unqualified module names, tasks that report "changed" on every run, shell commands where a real module exists, and files left with unsafe permissions. It runs on save in the workspace and again on commit.</p>
+        <p class="body"><strong>Why it matters here:</strong> it settles every style argument before review, so the reviewer spends their attention on whether the change is <strong>right</strong> rather than whether it is tidy. And it catches the class of defect that does not fail in test — the non-idempotent task that passes once, then quietly re-applies itself on every run afterward.</p>
+        <p class="body">Because lint runs inside the same execution environment AAP uses, "passes here" genuinely means "parses there."</p>
+      </div>
+      <div class="captext" data-cap="3">
+        <h2>The pull request is where the machine checks happen</h2>
+        <p class="body">Four automated gates run before any human is asked for an opinion: syntax, lint at production profile, a molecule run that converges the role and then proves it is idempotent, and a check that the execution environment matches.</p>
+        <p class="body">Merging is blocked, and not by policy or good intentions. The branch protection rule will not let it through.</p>
+      </div>
+      <div class="captext" data-cap="4">
+        <h2>Then the team that owns the directory approves it</h2>
+        <p class="body">This is the whole governance model, and it is one line of configuration. <code>CODEOWNERS</code> maps a directory to a team, and GitHub requires that team's approval on any change touching it.</p>
+        <p class="body">Storage engineers own storage automation. Network owns network. Nobody waits on a central gatekeeper who does not know the domain, and nobody merges into somebody else's domain without them seeing it.</p>
+      </div>
+      <div class="captext" data-cap="5">
+        <h2>Check mode shows the change before it happens</h2>
+        <p class="body">The first job runs with <code>--check</code>. Ansible walks every task and reports what it <strong>would</strong> do without writing anything to the array.</p>
+        <p class="body">Two changes predicted: create the volume, set the export policy. That output is the change record, produced before the change, and it is reviewable by someone who was not in the pull request.</p>
+      </div>
+      <div class="captext" data-cap="6">
+        <h2>Apply, and the result matches the prediction</h2>
+        <p class="body">Same job template, check mode off. Two changed, zero failed — exactly what check mode said.</p>
+        <p class="body">It runs from <code>main</code> only, in the pinned execution environment, under the job template's own credentials. Approving the merge and being allowed to run it against production are two separate permissions, held by two separate systems.</p>
+      </div>
+      <div class="captext" data-cap="7">
+        <h2>The same path, whoever you are</h2>
+        <p class="body">Nothing above is specific to storage. Change the directory and the owning team and the identical loop runs for network, platforms and cloud.</p>
+        <p class="body">Four teams keep their autonomy over their own domain. The organization keeps one review model, one tested content set, and one execution environment. That is the trade that usually has to be argued for, and here it falls out of the structure.</p>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="navbtn" id="prev">Back</button>
+      <button class="navbtn primary" id="next">Next</button>
+      <span class="kbd"><b>←</b> <b>→</b> to move</span>
+      <span class="count" id="count">1 / 8</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var TOTAL = 8, cur = -1, timers = [];
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var panels = [], caps = [], subs = [];
+  for (var i = 0; i < TOTAL; i++) panels.push(document.getElementById('p' + i));
+  caps = Array.prototype.slice.call(document.querySelectorAll('.captext'));
+  subs = Array.prototype.slice.call(document.querySelectorAll('.substep'));
+
+  function clearTimers(){
+    for (var i = 0; i < timers.length; i++) clearTimeout(timers[i]);
+    timers = [];
+  }
+  function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
+
+  function resetPanel(p){
+    var caret = p.querySelector('.caret');
+    if (caret && caret.parentNode) caret.parentNode.removeChild(caret);
+    var lines = p.querySelectorAll('.reveal .ln, .term .row');
+    for (var i = 0; i < lines.length; i++) lines[i].classList.remove('in');
+    var checks = p.querySelectorAll('.checks[data-seq] .check');
+    for (var j = 0; j < checks.length; j++){
+      checks[j].classList.remove('run'); checks[j].classList.remove('ok');
+    }
+    var gate = p.querySelector('.checks[data-seq]');
+    if (gate) {
+      var g = p.querySelector('.gate'); if (g) g.classList.remove('armed');
+    }
+  }
+
+  function runPanel(p){
+    // line-by-line code reveal
+    var code = p.querySelector('.reveal');
+    if (code){
+      var delay = parseInt(code.getAttribute('data-delay'), 10) || 120;
+      var lns = code.querySelectorAll('.ln');
+      for (var i = 0; i < lns.length; i++){
+        (function(el, n){
+          later(function(){
+            el.classList.add('in');
+            if (code.getAttribute('data-caret') && n === lns.length - 1){
+              var c = document.createElement('span');
+              c.className = 'caret'; el.appendChild(c);
+            }
+          }, reduce ? 0 : n * delay);
+        })(lns[i], i);
+      }
+    }
+    // terminal rows
+    var term = p.querySelector('.term[data-seq]');
+    if (term){
+      var td = parseInt(term.getAttribute('data-delay'), 10) || 150;
+      var rows = term.querySelectorAll('.row');
+      for (var r = 0; r < rows.length; r++){
+        (function(el, n){ later(function(){ el.classList.add('in'); }, reduce ? 0 : n * td); })(rows[r], r);
+      }
+    }
+    // CI checks: spin, then tick, one after another
+    var cw = p.querySelector('.checks[data-seq]');
+    if (cw){
+      var cd = parseInt(cw.getAttribute('data-delay'), 10) || 600;
+      var cs = cw.querySelectorAll('.check');
+      for (var k = 0; k < cs.length; k++){
+        (function(el, n){
+          if (reduce){ el.classList.add('ok'); return; }
+          later(function(){ el.classList.add('run'); }, n * cd);
+          later(function(){ el.classList.remove('run'); el.classList.add('ok'); }, n * cd + cd * 0.8);
+        })(cs[k], k);
+      }
+    }
+  }
+
+  function go(n){
+    if (n < 0 || n >= TOTAL || n === cur) return;
+    clearTimers();
+    if (cur >= 0){ panels[cur].classList.remove('on'); caps[cur].classList.remove('on'); }
+    cur = n;
+    resetPanel(panels[cur]);
+    panels[cur].classList.add('on');
+    caps[cur].classList.add('on');
+    runPanel(panels[cur]);
+
+    for (var i = 0; i < subs.length; i++){
+      subs[i].classList.toggle('on', i === cur);
+      subs[i].classList.toggle('done', i < cur);
+    }
+    var groups = document.querySelectorAll('.stage-group');
+    var stage = cur <= 2 ? 1 : (cur <= 4 ? 2 : 3);
+    for (var g = 0; g < groups.length; g++){
+      groups[g].classList.toggle('on', parseInt(groups[g].getAttribute('data-stage'), 10) === stage);
+    }
+    document.getElementById('count').textContent = (cur + 1) + ' / ' + TOTAL;
+    document.getElementById('prev').disabled = (cur === 0);
+    var nx = document.getElementById('next');
+    nx.disabled = (cur === TOTAL - 1);
+    nx.textContent = (cur === TOTAL - 1) ? 'End' : 'Next';
+  }
+
+  for (var s = 0; s < subs.length; s++){
+    (function(btn){
+      btn.addEventListener('click', function(){ go(parseInt(btn.getAttribute('data-go'), 10)); });
+    })(subs[s]);
+  }
+  document.getElementById('next').addEventListener('click', function(){ go(cur + 1); });
+  document.getElementById('prev').addEventListener('click', function(){ go(cur - 1); });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === 'PageDown'){ e.preventDefault(); go(cur + 1); }
+    if (e.key === 'ArrowLeft'  || e.key === 'PageUp'){ e.preventDefault(); go(cur - 1); }
+    if (e.key === 'Home'){ e.preventDefault(); go(0); }
+    if (e.key === 'End'){ e.preventDefault(); go(TOTAL - 1); }
+  });
+
+  go(0);
+})();
+</script>
+</body>
+</html>
