@@ -70,9 +70,9 @@ body{
 .main{display:flex;flex-direction:column;min-width:0;min-height:0}
 .stagewrap{
   flex:1;min-height:0;padding:26px 30px 14px;display:flex;
-  align-items:center;justify-content:center;overflow:auto;
+  align-items:flex-start;justify-content:center;overflow:auto;
 }
-.panel{display:none;width:100%;max-width:880px}
+.panel{display:none;width:100%;max-width:880px;margin-block:auto}
 .panel.on{display:block}
 
 /* ---------- generic chrome ---------- */
@@ -294,6 +294,104 @@ body{
 @media (prefers-reduced-motion: reduce){
   *{animation-duration:.001ms!important;transition-duration:.001ms!important}
 }
+/* ---------- Dev Spaces / VS Code shell ---------- */
+.panel.ide-panel{max-width:960px}
+.vsc{
+  --vbg:#1f1f1f; --vside:#181818; --vline:#2b2b2b; --vtxt:#cccccc; --vdim:#9d9d9d; --vblue:#0078d4;
+  background:var(--vbg);border:1px solid #333;border-radius:9px;overflow:hidden;
+  box-shadow:0 22px 50px rgba(0,0,0,.55);color:var(--vtxt);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;font-size:12px;line-height:1.4;
+}
+.vsc svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.vs-browser{background:#0f0f10;border-bottom:1px solid var(--vline)}
+.vs-btabs{display:flex;align-items:flex-end;gap:8px;padding:8px 10px 0}
+.vs-dots{display:flex;gap:6px;padding:0 4px 9px 2px;flex:none}
+.vs-dots i{width:10px;height:10px;border-radius:50%;background:#3a3d40;display:block}
+.vs-btab{display:flex;align-items:center;gap:7px;min-width:0;max-width:560px;background:#1c1c1e;
+  border:1px solid var(--vline);border-bottom:0;border-radius:7px 7px 0 0;padding:6px 13px;font-size:11px;color:#bdbdbd}
+.vs-btab .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vs-fav{width:11px;height:11px;border-radius:2px;background:#ee0000;flex:none}
+.vs-url{background:#1c1c1e;padding:6px 10px;display:flex;gap:10px;align-items:center}
+.vs-url .ar,.vs-cmd .ar{color:#6e6e6e;font-size:13px;letter-spacing:8px;flex:none}
+.vs-url .u{flex:1;background:#101011;border:1px solid var(--vline);border-radius:6px;padding:4px 12px;
+  font-size:11.5px;color:#b8b8b8;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vs-cmd{height:32px;display:flex;align-items:center;justify-content:center;gap:12px;background:var(--vside);border-bottom:1px solid var(--vline)}
+.vs-cc{width:min(48%,380px);background:#222325;border:1px solid #3a3a3a;border-radius:6px;padding:3px 10px;
+  font-size:11.5px;color:var(--vdim);text-align:center}
+.vs-body{display:grid;grid-template-columns:42px 196px minmax(0,1fr);min-height:318px}
+.vs-act{background:var(--vside);border-right:1px solid var(--vline);display:flex;flex-direction:column;align-items:center;padding:2px 0 6px}
+.vs-act .i{width:42px;height:40px;display:grid;place-items:center;color:#868686;position:relative}
+.vs-act .i svg{width:21px;height:21px}
+.vs-act .i.on{color:#e7e7e7;box-shadow:inset 2px 0 0 var(--vblue)}
+.vs-act .sp{flex:1}
+.vs-badge{position:absolute;right:7px;bottom:7px;background:var(--vblue);color:#fff;font-size:9px;font-weight:600;
+  border-radius:8px;min-width:15px;height:15px;display:grid;place-items:center;padding:0 3px;font-style:normal}
+.vs-side{background:var(--vside);border-right:1px solid var(--vline);display:flex;flex-direction:column;min-width:0}
+.vs-sidehd{display:flex;justify-content:space-between;align-items:center;padding:10px 12px 8px 20px;font-size:11px}
+.vs-tree{flex:1;padding-bottom:8px}
+.vs-row{display:flex;align-items:center;gap:4px;height:22px;padding-right:8px;white-space:nowrap;overflow:hidden;
+  border:1px solid transparent;font-size:12.5px;color:var(--vtxt)}
+.vs-row.sec{font-size:11px;font-weight:700}
+.vs-row.sel{background:#37373d}
+.vs-row.focus{border-color:var(--vblue)}
+.vs-row .nm{overflow:hidden;text-overflow:ellipsis}
+.chev{width:14px;flex:none;display:inline-grid;place-items:center;color:#c5c5c5;font-size:13px;line-height:1}
+.chev.open{transform:rotate(90deg)}
+.fi{width:16px;flex:none;text-align:center;font-family:Menlo,Monaco,Consolas,monospace;font-size:10.5px;font-weight:700}
+.fi.json{color:#cbcb41}.fi.yaml{color:#a074c4}.fi.md{color:#519aba}.fi.dot{color:#a0a0a0}
+.vs-coll{border-top:1px solid var(--vline)}
+.vs-coll div{display:flex;align-items:center;gap:4px;height:23px;padding-left:4px;font-size:11px;font-weight:700;border-bottom:1px solid var(--vline)}
+.vs-main{display:flex;flex-direction:column;min-width:0}
+.vs-tabs{display:flex;height:35px;background:var(--vside);border-bottom:1px solid var(--vline)}
+.vs-tab{display:flex;align-items:center;gap:6px;padding:0 13px;font-size:12.5px;color:var(--vdim);border-right:1px solid var(--vline);white-space:nowrap}
+.vs-tab.on{background:var(--vbg);color:#fff;box-shadow:inset 0 1px 0 var(--vblue);margin-bottom:-1px}
+.vs-tab.pv .nm{font-style:italic}
+.vs-tab .x{font-size:14px;color:var(--vdim);margin-left:3px}
+.vs-crumbs{height:24px;display:flex;align-items:center;gap:6px;padding:0 16px;font-size:12px;color:#a9a9a9;white-space:nowrap;overflow:hidden}
+.vs-crumbs .sep{color:#6e6e6e}
+.vs-crumbs .fi{width:auto;margin-right:3px}
+.vs-ed{display:flex;flex:1;min-height:0}
+.vs-ed .code{flex:1;margin:0;padding:2px 0 12px;overflow-x:auto;
+  font-family:"Droid Sans Mono",Menlo,Monaco,Consolas,monospace;font-size:12.5px;line-height:19px}
+.vs-ed .ln{display:block;white-space:pre;color:var(--vtxt);padding-right:14px}
+.vs-ed .gut{display:inline-block;width:52px;padding-right:22px;text-align:right;color:#6e7681}
+.ig{display:inline-block;height:19px;vertical-align:top;box-shadow:inset 1px 0 0 #404040}
+.jb1{color:#ffd700}.jb2{color:#da70d6}.jk{color:#9cdcfe}.js{color:#ce9178}.jp{color:var(--vtxt)}
+.yk{color:#569cd6}.ys{color:#ce9178}.yn{color:#b5cea8}.yb{color:#569cd6}.yp{color:#d4d4d4}
+.vsc .caret{background:#aeafad;width:2px}
+.mm{width:62px;flex:none;padding:6px 10px 6px 6px;box-shadow:inset 1px 0 0 #2a2a2a}
+.mm i{display:block;height:2px;margin-bottom:2px;background:#6b6b6b;opacity:0;border-radius:1px}
+.mm i.in,.mm.static i{opacity:.75}
+.vs-ed .ln.v-good{display:none}
+.vsc.st-fixed .vs-ed .ln.v-bad{display:none}
+.vsc.st-fixed .vs-ed .ln.v-good{display:block;animation:vsflash 1.6s ease-out}
+@keyframes vsflash{0%{background:#264f78}100%{background:transparent}}
+.vsc.st-bad .sq{text-decoration:underline wavy #f14c4c;text-decoration-thickness:1px;text-underline-offset:4px}
+.errct{display:none}
+.vsc.st-bad .errname{color:#f88070}
+.vsc.st-bad .errct{display:inline;color:#f88070;font-size:11px;margin-left:auto;padding-left:6px}
+.vs-panel{border-top:1px solid var(--vline);background:var(--vside)}
+.vs-ptabs{display:flex;align-items:center;gap:20px;height:34px;padding:0 16px;font-size:11px;color:var(--vdim)}
+.vs-ptabs .on{color:#e7e7e7;align-self:stretch;display:flex;align-items:center;box-shadow:inset 0 -1px 0 var(--vblue)}
+.pbadge{display:inline-grid;place-items:center;min-width:16px;height:16px;padding:0 4px;margin-left:6px;
+  border-radius:8px;background:#616161;color:#fff;font-size:10px;font-weight:600}
+.pbadge.zero{display:none}
+.vs-tsel{margin-left:auto;color:var(--vtxt);font-size:11.5px}
+.vs-panel .term{border-top:0;background:var(--vside);padding:2px 16px 14px;
+  font-family:"Droid Sans Mono",Menlo,Monaco,Consolas,monospace;font-size:12px;line-height:1.6}
+.vs-panel .term .row{white-space:pre-wrap;color:var(--vtxt)}
+.vs-panel .term .tp{color:#3b8eea}
+.vs-status{display:flex;align-items:center;height:23px;background:var(--vside);border-top:1px solid var(--vline);
+  font-size:11.5px;color:var(--vtxt);white-space:nowrap;overflow:hidden}
+.vs-status .it{display:flex;align-items:center;gap:4px;height:100%;padding:0 7px}
+.vs-status .it svg{width:14px;height:14px}
+.vs-status .rem{padding:0 11px}
+.vs-status .sp{flex:1}
+@media (max-width:1100px){ .vs-status .dim{display:none} }
+@media (max-width:860px){
+  .vs-body{grid-template-columns:1fr}
+  .vs-act,.vs-side,.mm,.vs-cmd{display:none}
+}
 </style>
 </head>
 <body>
@@ -328,93 +426,13 @@ body{
     <div class="stagewrap">
 
       <!-- 0 : workspace -->
-      <section class="panel" id="p0">
-        <div class="win">
-          <div class="titlebar">
-            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-            <span class="urlpill">devspaces.apps.rm2.thpm.p1.openshiftapps.com</span>
-          </div>
-          <div class="ide">
-            <div class="files">
-              <div class="repo">ansible-devspaces-demo</div>
-              <ul>
-                <li>.vscode/</li><li class="sel">extensions.json</li><li>settings.json</li>
-                <li>collections/</li><li>.ansible-lint</li><li>.pre-commit-config.yaml</li>
-                <li>.yamllint</li><li>devfile.yaml</li><li>README.md</li>
-              </ul>
-            </div>
-            <div class="editor">
-              <div class="tabs"><span class="tab on">extensions.json</span></div>
-              <pre class="code reveal" data-seq="line" data-delay="90"><span class="ln"><span class="gut">1</span><span class="p">{</span></span><span class="ln"><span class="gut">2</span>  <span class="k">"recommendations"</span><span class="p">: [</span></span><span class="ln"><span class="gut">3</span>    <span class="s">"ms-python.python"</span><span class="p">,</span></span><span class="ln"><span class="gut">4</span>    <span class="s">"redhat.ansible"</span><span class="p">,</span></span><span class="ln"><span class="gut">5</span>    <span class="s">"redhat.vscode-openshift-connector"</span><span class="p">,</span></span><span class="ln"><span class="gut">6</span>    <span class="s">"ms-python.black-formatter"</span></span><span class="ln"><span class="gut">7</span>  <span class="p">]</span></span><span class="ln"><span class="gut">8</span><span class="p">}</span></span></pre>
-            </div>
-          </div>
-        </div>
-      </section>
+      <section class="panel ide-panel" id="p0"><div data-ide="ext"></div></section>
 
       <!-- 1 : playbook -->
-      <section class="panel" id="p1">
-        <div class="win">
-          <div class="titlebar">
-            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-            <span class="urlpill">devspaces.apps.rm2.thpm.p1.openshiftapps.com</span>
-          </div>
-          <div class="ide">
-            <div class="files">
-              <div class="repo">ansible-devspaces-demo</div>
-              <ul>
-                <li>collections/</li><li>roles/</li>
-                <li class="sel">storage/playbook.yml</li>
-                <li>network/</li><li>platforms/</li><li>cloud/</li>
-                <li>.ansible-lint</li><li>devfile.yaml</li>
-              </ul>
-            </div>
-            <div class="editor">
-              <div class="tabs">
-                <span class="tab">extensions.json</span><span class="tab on">playbook.yml</span>
-              </div>
-              <pre class="code reveal" data-seq="line" data-delay="170" data-caret="1"><span class="ln"><span class="gut">1</span><span class="p">---</span></span><span class="ln"><span class="gut">2</span><span class="p">- </span><span class="k">name</span><span class="p">:</span> <span class="s">Provision ONTAP volume</span></span><span class="ln"><span class="gut">3</span>  <span class="k">hosts</span><span class="p">:</span> <span class="s">storage</span></span><span class="ln"><span class="gut">4</span>  <span class="k">gather_facts</span><span class="p">:</span> <span class="s">false</span></span><span class="ln"><span class="gut">5</span>  <span class="k">roles</span><span class="p">:</span></span><span class="ln"><span class="gut">6</span>    <span class="p">- </span><span class="k">role</span><span class="p">:</span> <span class="s">provision_ontap_volume</span></span><span class="ln"><span class="gut">7</span>      <span class="k">vars</span><span class="p">:</span></span><span class="ln"><span class="gut">8</span>        <span class="k">volume_size_gb</span><span class="p">:</span> <span class="s">500</span></span><span class="ln"><span class="gut">9</span>        <span class="k">export_policy</span><span class="p">:</span> <span class="s">prod</span></span></pre>
-            </div>
-          </div>
-        </div>
-      </section>
+      <section class="panel ide-panel" id="p1"><div data-ide="play"></div></section>
 
       <!-- 2 : lint -->
-      <section class="panel" id="p2">
-        <div class="win">
-          <div class="titlebar">
-            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-            <span class="urlpill">devspaces.apps.rm2.thpm.p1.openshiftapps.com</span>
-          </div>
-          <div class="ide" style="min-height:150px">
-            <div class="files">
-              <div class="repo">ansible-devspaces-demo</div>
-              <ul>
-                <li class="sel">storage/playbook.yml</li><li>.ansible-lint</li>
-                <li>.pre-commit-config.yaml</li><li>devfile.yaml</li>
-              </ul>
-            </div>
-            <div class="editor">
-              <div class="tabs"><span class="tab on">playbook.yml</span></div>
-              <pre class="code"><span class="ln"><span class="gut">6</span>    <span class="p">- </span><span class="k">role</span><span class="p">:</span> <span class="s">provision_ontap_volume</span></span><span class="ln"><span class="gut">7</span>      <span class="k">vars</span><span class="p">:</span></span><span class="ln"><span class="gut">8</span>        <span class="k">volume_size_gb</span><span class="p">:</span> <span class="s">500</span></span></pre>
-            </div>
-          </div>
-          <div class="term" data-seq="row" data-delay="210">
-            <span class="row"><span class="cmd">$ ansible-lint storage/playbook.yml</span></span>
-            <span class="row"> </span>
-            <span class="row"><span class="fail">fqcn[action-core]</span>  <span class="note">storage/playbook.yml:12</span></span>
-            <span class="row"><span class="note">  Use FQCN for builtin module actions — </span><span class="rule">command</span><span class="note"> → </span><span class="rule">ansible.builtin.command</span></span>
-            <span class="row"><span class="fail">no-changed-when</span>  <span class="note">storage/playbook.yml:12</span></span>
-            <span class="row"><span class="note">  Commands should not change things if nothing needs doing</span></span>
-            <span class="row"><span class="fail">risky-file-permissions</span>  <span class="note">roles/provision_ontap_volume/tasks/main.yml:24</span></span>
-            <span class="row"><span class="note">  File permissions unset or incorrect</span></span>
-            <span class="row"> </span>
-            <span class="row"><span class="warn">Failed: 3 failure(s) — profile: production</span></span>
-            <span class="row"> </span>
-            <span class="row"><span class="cmd">$ ansible-lint storage/playbook.yml</span></span>
-            <span class="row"><span class="pass">Passed: 0 failure(s), 0 warning(s) — profile: production</span></span>
-          </div>
-        </div>
-      </section>
+      <section class="panel ide-panel" id="p2"><div data-ide="lint"></div></section>
 
       <!-- 3 : PR checks -->
       <section class="panel" id="p3">
@@ -615,62 +633,251 @@ body{
 
 <script>
 (function(){
+  /* ---------------- Dev Spaces IDE builder ---------------- */
+  var IC = {
+    menu:'<svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
+    files:'<svg viewBox="0 0 24 24"><path d="M9 3h7l4 4v11a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M16 3v4h4"/><path d="M5 7v13a1 1 0 0 0 1 1h9"/></svg>',
+    search:'<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg>',
+    scm:'<svg viewBox="0 0 24 24"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="8" r="2"/><path d="M6 7v10"/><path d="M18 10c0 4-7 3-11.3 7.4"/></svg>',
+    debug:'<svg viewBox="0 0 24 24"><path d="M9 5l10 7-10 7z"/><circle cx="6" cy="18" r="2.5"/></svg>',
+    ext:'<svg viewBox="0 0 24 24"><path d="M4 10h6v6H4zM10 10h6v6h-6zM4 16h6v5H4z"/><path d="M14.5 3.8l5.3 1.4-1.4 5.3-5.3-1.4z"/></svg>',
+    test:'<svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5.3 9.2A1.9 1.9 0 0 0 6.3 21h11.4a1.9 1.9 0 0 0 1.6-2.8L14 9V3"/></svg>',
+    ansible:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.3 16.6L12 7.2l4.2 9.8-6.3-4.6"/></svg>',
+    remote:'<svg viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4v4h-4"/></svg>',
+    account:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.4-3.8 4.2-5.6 7.5-5.6s6.1 1.8 7.5 5.6"/></svg>',
+    gear:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>',
+    err:'<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M5.8 5.8l4.4 4.4M10.2 5.8l-4.4 4.4"/></svg>',
+    warn:'<svg viewBox="0 0 16 16"><path d="M8 2.2l6 11H2z"/><path d="M8 6.5v3.2M8 11.4v.2"/></svg>',
+    cloud:'<svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.8 2.8 0 0 0 .3-5.6A4 4 0 0 0 4.2 7.6a2.5 2.5 0 0 0 .3 4.9z"/></svg>',
+    remotes:'<svg viewBox="0 0 16 16"><path d="M3 5.5l3 2.5-3 2.5M13 5.5l-3 2.5 3 2.5"/></svg>',
+    bell:'<svg viewBox="0 0 16 16"><path d="M4 11V7.5a4 4 0 0 1 8 0V11l1 1.3H3z"/><path d="M6.8 14h2.4"/></svg>'
+  };
+  var FI = {json:['{}','json'], yaml:['!','yaml'], md:['\u24D8','md'], dot:['\u2261','dot']};
+  function fic(k){ return '<span class="fi '+FI[k][1]+'">'+FI[k][0]+'</span>'; }
+  function strip(h){ return h.replace(/<[^>]*>/g,''); }
+
+  function tree(rows){
+    var h='';
+    for (var i=0;i<rows.length;i++){
+      var r=rows[i], d=r[0], kind=r[1], name=r[2], fl=r[3]||'';
+      var sec=fl.indexOf('sec')>-1, errf=fl.indexOf('errfile')>-1;
+      var depth = sec ? 0 : d+1;
+      var lead = (kind==='open'||kind==='dir')
+        ? '<span class="chev'+(kind==='open'?' open':'')+'">\u203A</span>'
+        : '<span class="chev"></span>'+fic(kind);
+      h+='<div class="vs-row '+fl+'" style="padding-left:'+(4+depth*8)+'px">'+lead+
+         '<span class="nm'+(errf?' errname':'')+'">'+name+'</span>'+(errf?'<span class="errct">3</span>':'')+'</div>';
+    }
+    return h;
+  }
+  function codeLines(arr, unit){
+    var h='', n=0;
+    for (var i=0;i<arr.length;i++){
+      var l=arr[i], num = (l[3]!==undefined) ? l[3] : ++n;
+      var ig=''; for (var j=0;j<l[0];j++) ig+='<span class="ig" style="width:'+unit+'ch"></span>';
+      h+='<span class="ln'+(l[2]?' '+l[2]:'')+'"><span class="gut">'+num+'</span>'+ig+l[1]+'</span>';
+    }
+    return h;
+  }
+  function minimap(arr, unit){
+    var h='';
+    for (var i=0;i<arr.length;i++){
+      var l=arr[i]; if (l[2]==='v-good') continue;
+      h+='<i style="margin-left:'+(l[0]*unit*1.1)+'px;width:'+Math.min(40, strip(l[1]).length*0.9)+'px"></i>';
+    }
+    return h;
+  }
+  function status(c){
+    return '<div class="vs-status"><span class="it rem">'+IC.remotes+'</span>'+
+      '<span class="it">'+IC.err+'<span class="js-err">0</span>'+IC.warn+'<span>0</span></span>'+
+      '<span class="it">'+IC.cloud+'OpenShift</span><span class="it">logged-user</span><span class="it">ryan-nix-dev</span>'+
+      '<span class="it dim">Mem: 1.59/8.05 GB 19%</span><span class="it dim">CPU: 399 m</span><span class="sp"></span>'+
+      '<span class="it">'+c.pos+'</span><span class="it">'+c.sp+'</span><span class="it">UTF-8</span><span class="it">LF</span>'+
+      '<span class="it">'+c.lang+'</span><span class="it">'+IC.bell+'</span></div>';
+  }
+  function ide(c){
+    var act='', k, keys=['menu','files','search','scm','debug','ext','test','ansible','remote'];
+    for (k=0;k<keys.length;k++) act+='<span class="i'+(keys[k]==='files'?' on':'')+'">'+IC[keys[k]]+'</span>';
+    act+='<span class="sp"></span><span class="i">'+IC.account+'<i class="vs-badge">1</i></span><span class="i">'+IC.gear+'</span>';
+    var tabs='';
+    for (k=0;k<c.tabs.length;k++){
+      var t=c.tabs[k];
+      tabs+='<span class="vs-tab'+(t.on?' on':'')+(t.pv?' pv':'')+'">'+fic(t.k)+
+        '<span class="nm'+(t.err?' errname':'')+'">'+t.n+'</span>'+(t.err?'<span class="errct">3</span>':'')+
+        (t.on?'<span class="x">\u00D7</span>':'')+'</span>';
+    }
+    var crumbs='';
+    for (k=0;k<c.crumbs.length;k++) crumbs+=(k?'<span class="sep">\u203A</span>':'')+'<span>'+c.crumbs[k]+'</span>';
+    var pre='<pre class="code'+(c.reveal?' reveal':'')+'"'+(c.reveal?' data-delay="'+c.reveal+'"':'')+
+            (c.caret?' data-caret="1"':'')+'>'+codeLines(c.lines,c.unit)+'</pre>';
+    var mm='<div class="mm'+(c.reveal?'':' static')+'" aria-hidden="true">'+minimap(c.lines,c.unit)+'</div>';
+    var panel = c.term ? '<div class="vs-panel"><div class="vs-ptabs"><span>PROBLEMS<b class="pbadge js-pbadge zero">0</b></span>'+
+      '<span>OUTPUT</span><span>DEBUG CONSOLE</span><span class="on">TERMINAL</span><span>PORTS</span>'+
+      '<span class="vs-tsel">bash - tools</span></div>'+c.term+'</div>' : '';
+    return '<div class="vsc" data-st-init="clean" data-err-init="0">'+
+      '<div class="vs-browser"><div class="vs-btabs"><span class="vs-dots"><i></i><i></i><i></i></span>'+
+      '<span class="vs-btab"><span class="vs-fav"></span><span class="t">'+c.title+
+      ' \u2014 (Workspace) \u2014 Red Hat OpenShift Dev Spaces with Microsoft Visual Studio Code - Open Source</span></span></div>'+
+      '<div class="vs-url"><span class="ar">\u2039 \u203A</span><span class="u">devspaces.apps.rm2.thpm.p1.openshiftapps.com</span></div></div>'+
+      '<div class="vs-cmd"><span class="ar">\u2190 \u2192</span><span class="vs-cc">ansible-devspaces-demo</span></div>'+
+      '<div class="vs-body"><div class="vs-act">'+act+'</div>'+
+      '<div class="vs-side"><div class="vs-sidehd"><span>EXPLORER</span><span>\u00B7\u00B7\u00B7</span></div>'+
+      '<div class="vs-tree">'+tree(c.tree)+'</div>'+
+      '<div class="vs-coll"><div><span class="chev">\u203A</span>OUTLINE</div><div><span class="chev">\u203A</span>TIMELINE</div>'+
+      '<div><span class="chev">\u203A</span>ENDPOINTS</div></div></div>'+
+      '<div class="vs-main"><div class="vs-tabs">'+tabs+'</div><div class="vs-crumbs">'+crumbs+'</div>'+
+      '<div class="vs-ed">'+pre+mm+'</div>'+panel+'</div></div>'+status(c)+'</div>';
+  }
+
+  var S='<span class="', E='</span>';
+  function y(k,v,vc){ return S+'yk">'+k+E+S+'yp">: '+E+(v!==undefined? S+(vc||'ys')+'">'+v+E : ''); }
+  function yd(k,v,vc){ return S+'yp">- '+E+y(k,v,vc); }
+
+  var EXT = [
+    [0, S+'jb1">{'+E],
+    [1, S+'jk">"recommendations"'+E+S+'jp">: '+E+S+'jb2">['+E],
+    [2, S+'js">"ms-python.python"'+E+S+'jp">,'+E],
+    [2, S+'js">"redhat.ansible"'+E+S+'jp">,'+E],
+    [2, S+'js">"redhat.vscode-openshift-connector"'+E+S+'jp">,'+E],
+    [2, S+'js">"ms-python.black-formatter"'+E],
+    [1, S+'jb2">]'+E],
+    [0, S+'jb1">}'+E],
+    [0, '']
+  ];
+  var PLAY = [
+    [0, S+'yp">---'+E],
+    [0, yd('name','Provision ONTAP volume')],
+    [1, y('hosts','storage')],
+    [1, y('gather_facts','false','yb')],
+    [1, S+'yk">roles'+E+S+'yp">:'+E],
+    [2, yd('role','provision_ontap_volume')],
+    [3, S+'yk">vars'+E+S+'yp">:'+E],
+    [4, y('volume_size_gb','500','yn')],
+    [4, y('export_policy','prod')]
+  ];
+  var LINT = [
+    [0, yd('name','Check aggregate headroom'), '', 11],
+    [1, S+'yk sq">command'+E+S+'yp">: '+E+S+'ys">ontap-cli aggr show -fields availsize'+E, 'v-bad', 12],
+    [1, y('ansible.builtin.command','ontap-cli aggr show -fields availsize'), 'v-good', 12],
+    [1, y('register','aggr_headroom'), '', 13],
+    [1, y('changed_when','false','yb'), 'v-good', 14],
+    [0, '', 'v-bad', 14],
+    [0, '', 'v-good', 15],
+    [0, yd('name','Create volume'), 'v-bad', 15],
+    [0, yd('name','Create volume'), 'v-good', 16]
+  ];
+  var TERM =
+    '<div class="term" data-seq="row" data-delay="190">'+
+    '<span class="row"><span class="tp">/projects/ansible-devspaces-demo $</span> <span class="cmd">ansible-lint</span></span>'+
+    '<span class="row" data-wait="800"><span class="fail">fqcn[action-core]</span><span class="note">: Use FQCN for builtin module actions (command).</span></span>'+
+    '<span class="row">roles/provision_ontap_volume/tasks/main.yml:12 <span class="note">Use </span><span class="rule">ansible.builtin.command</span><span class="note"> instead.</span></span>'+
+    '<span class="row"><span class="fail">no-changed-when</span><span class="note">: Commands should not change things if nothing needs doing.</span></span>'+
+    '<span class="row">roles/provision_ontap_volume/tasks/main.yml:11 <span class="note">Task/Handler: Check aggregate headroom</span></span>'+
+    '<span class="row"><span class="fail">risky-file-permissions</span><span class="note">: File permissions unset or incorrect.</span></span>'+
+    '<span class="row">roles/provision_ontap_volume/tasks/main.yml:24 <span class="note">Task/Handler: Write export policy manifest</span></span>'+
+    '<span class="row"> </span>'+
+    '<span class="row" data-err="3" data-st="bad"><span class="warn">Failed: 3 failure(s), 0 warning(s) on 12 files.</span></span>'+
+    '<span class="row" data-wait="1700" data-st="fixed"> </span>'+
+    '<span class="row" data-wait="1100"><span class="tp">/projects/ansible-devspaces-demo $</span> <span class="cmd">ansible-lint</span></span>'+
+    '<span class="row" data-wait="800" data-err="0"><span class="pass">Passed: 0 failure(s), 0 warning(s) on 12 files. Last profile that met the validation criteria was \'production\'.</span></span>'+
+    '</div>';
+
+  var CFG = {
+    ext: { title:'extensions.json',
+      tree:[[0,'open','(WORKSPACE)','sec'],[0,'open','ansible-devspaces-demo','focus'],[1,'open','.vscode'],
+            [2,'json','extensions.json','sel'],[2,'json','settings.json'],[1,'dir','collections'],
+            [1,'dot','.ansible-lint'],[1,'json','.code-workspace'],[1,'yaml','.pre-commit-config.yaml'],
+            [1,'dot','.yamllint'],[1,'yaml','devfile.yaml'],[1,'md','README.md']],
+      tabs:[{k:'json',n:'extensions.json',on:1,pv:1}],
+      crumbs:['ansible-devspaces-demo','.vscode',fic('json')+'extensions.json','\u2026'],
+      lines:EXT, unit:4, reveal:90, pos:'Ln 1, Col 1', sp:'Spaces: 4', lang:'{ } JSON with Comments' },
+    play: { title:'playbook.yml',
+      tree:[[0,'open','(WORKSPACE)','sec'],[0,'open','ansible-devspaces-demo'],[1,'dir','.vscode'],
+            [1,'dir','cloud'],[1,'dir','collections'],[1,'dir','network'],[1,'dir','platforms'],[1,'dir','roles'],
+            [1,'open','storage'],[2,'yaml','playbook.yml','sel'],[1,'dot','.ansible-lint'],
+            [1,'yaml','devfile.yaml'],[1,'md','README.md']],
+      tabs:[{k:'json',n:'extensions.json'},{k:'yaml',n:'playbook.yml',on:1}],
+      crumbs:['ansible-devspaces-demo','storage',fic('yaml')+'playbook.yml','\u2026'],
+      lines:PLAY, unit:2, reveal:170, caret:1, pos:'Ln 9, Col 29', sp:'Spaces: 2', lang:'Ansible' },
+    lint: { title:'main.yml',
+      tree:[[0,'open','(WORKSPACE)','sec'],[0,'open','ansible-devspaces-demo'],[1,'dir','.vscode'],
+            [1,'dir','collections'],[1,'open','roles'],[2,'open','provision_ontap_volume'],[3,'open','tasks'],
+            [4,'yaml','main.yml','sel errfile'],[1,'open','storage'],[2,'yaml','playbook.yml'],
+            [1,'dot','.ansible-lint'],[1,'yaml','devfile.yaml']],
+      tabs:[{k:'yaml',n:'playbook.yml'},{k:'yaml',n:'main.yml',on:1,err:1}],
+      crumbs:['ansible-devspaces-demo','roles','provision_ontap_volume','tasks',fic('yaml')+'main.yml','\u2026'],
+      lines:LINT, unit:2, pos:'Ln 12, Col 3', sp:'Spaces: 2', lang:'Ansible', term:TERM }
+  };
+  var hosts = document.querySelectorAll('[data-ide]');
+  for (var h=0; h<hosts.length; h++) hosts[h].outerHTML = ide(CFG[hosts[h].getAttribute('data-ide')]);
+
+  /* ---------------- step engine ---------------- */
   var TOTAL = 8, cur = -1, timers = [];
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var panels = [], caps = [], subs = [];
+  var panels = [];
   for (var i = 0; i < TOTAL; i++) panels.push(document.getElementById('p' + i));
-  caps = Array.prototype.slice.call(document.querySelectorAll('.captext'));
-  subs = Array.prototype.slice.call(document.querySelectorAll('.substep'));
+  var caps = Array.prototype.slice.call(document.querySelectorAll('.captext'));
+  var subs = Array.prototype.slice.call(document.querySelectorAll('.substep'));
 
-  function clearTimers(){
-    for (var i = 0; i < timers.length; i++) clearTimeout(timers[i]);
-    timers = [];
-  }
+  function clearTimers(){ for (var i = 0; i < timers.length; i++) clearTimeout(timers[i]); timers = []; }
   function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
+
+  function setErr(p, v){
+    var a = p.querySelectorAll('.js-err'); for (var i = 0; i < a.length; i++) a[i].textContent = v;
+    var b = p.querySelectorAll('.js-pbadge');
+    for (var j = 0; j < b.length; j++){ b[j].textContent = v; b[j].classList.toggle('zero', v === '0'); }
+  }
+  function setState(p, s){
+    var v = p.querySelector('.vsc'); if (!v) return;
+    v.classList.remove('st-clean', 'st-bad', 'st-fixed'); v.classList.add('st-' + s);
+  }
 
   function resetPanel(p){
     var caret = p.querySelector('.caret');
     if (caret && caret.parentNode) caret.parentNode.removeChild(caret);
-    var lines = p.querySelectorAll('.reveal .ln, .term .row');
-    for (var i = 0; i < lines.length; i++) lines[i].classList.remove('in');
-    var checks = p.querySelectorAll('.checks[data-seq] .check');
-    for (var j = 0; j < checks.length; j++){
-      checks[j].classList.remove('run'); checks[j].classList.remove('ok');
+    var els = p.querySelectorAll('.reveal .ln, .term .row, .mm i');
+    for (var i = 0; i < els.length; i++) els[i].classList.remove('in');
+    var cw = p.querySelector('.checks[data-seq]');
+    if (cw){
+      var cs = cw.querySelectorAll('.check');
+      for (var j = 0; j < cs.length; j++){ cs[j].classList.remove('run'); cs[j].classList.remove('ok'); }
     }
-    var gate = p.querySelector('.checks[data-seq]');
-    if (gate) {
-      var g = p.querySelector('.gate'); if (g) g.classList.remove('armed');
-    }
+    var v = p.querySelector('.vsc');
+    if (v){ setState(p, v.getAttribute('data-st-init')); setErr(p, v.getAttribute('data-err-init')); }
   }
 
   function runPanel(p){
-    // line-by-line code reveal
     var code = p.querySelector('.reveal');
     if (code){
       var delay = parseInt(code.getAttribute('data-delay'), 10) || 120;
-      var lns = code.querySelectorAll('.ln');
+      var lns = code.querySelectorAll('.ln'), mms = p.querySelectorAll('.mm i');
       for (var i = 0; i < lns.length; i++){
         (function(el, n){
           later(function(){
             el.classList.add('in');
+            if (mms[n]) mms[n].classList.add('in');
             if (code.getAttribute('data-caret') && n === lns.length - 1){
-              var c = document.createElement('span');
-              c.className = 'caret'; el.appendChild(c);
+              var c = document.createElement('span'); c.className = 'caret'; el.appendChild(c);
             }
           }, reduce ? 0 : n * delay);
         })(lns[i], i);
       }
     }
-    // terminal rows
     var term = p.querySelector('.term[data-seq]');
     if (term){
       var td = parseInt(term.getAttribute('data-delay'), 10) || 150;
-      var rows = term.querySelectorAll('.row');
+      var rows = term.querySelectorAll('.row'), t = 0;
       for (var r = 0; r < rows.length; r++){
-        (function(el, n){ later(function(){ el.classList.add('in'); }, reduce ? 0 : n * td); })(rows[r], r);
+        t += (r ? td : 0) + (parseInt(rows[r].getAttribute('data-wait'), 10) || 0);
+        (function(el, at){
+          later(function(){
+            el.classList.add('in');
+            if (el.hasAttribute('data-err')) setErr(p, el.getAttribute('data-err'));
+            if (el.hasAttribute('data-st')) setState(p, el.getAttribute('data-st'));
+          }, reduce ? 0 : at);
+        })(rows[r], t);
       }
     }
-    // CI checks: spin, then tick, one after another
     var cw = p.querySelector('.checks[data-seq]');
     if (cw){
       var cd = parseInt(cw.getAttribute('data-delay'), 10) || 600;
@@ -694,16 +901,14 @@ body{
     panels[cur].classList.add('on');
     caps[cur].classList.add('on');
     runPanel(panels[cur]);
-
     for (var i = 0; i < subs.length; i++){
       subs[i].classList.toggle('on', i === cur);
       subs[i].classList.toggle('done', i < cur);
     }
     var groups = document.querySelectorAll('.stage-group');
     var stage = cur <= 2 ? 1 : (cur <= 4 ? 2 : 3);
-    for (var g = 0; g < groups.length; g++){
+    for (var g = 0; g < groups.length; g++)
       groups[g].classList.toggle('on', parseInt(groups[g].getAttribute('data-stage'), 10) === stage);
-    }
     document.getElementById('count').textContent = (cur + 1) + ' / ' + TOTAL;
     document.getElementById('prev').disabled = (cur === 0);
     var nx = document.getElementById('next');
@@ -712,9 +917,7 @@ body{
   }
 
   for (var s = 0; s < subs.length; s++){
-    (function(btn){
-      btn.addEventListener('click', function(){ go(parseInt(btn.getAttribute('data-go'), 10)); });
-    })(subs[s]);
+    (function(btn){ btn.addEventListener('click', function(){ go(parseInt(btn.getAttribute('data-go'), 10)); }); })(subs[s]);
   }
   document.getElementById('next').addEventListener('click', function(){ go(cur + 1); });
   document.getElementById('prev').addEventListener('click', function(){ go(cur - 1); });
@@ -724,7 +927,6 @@ body{
     if (e.key === 'Home'){ e.preventDefault(); go(0); }
     if (e.key === 'End'){ e.preventDefault(); go(TOTAL - 1); }
   });
-
   go(0);
 })();
 </script>
