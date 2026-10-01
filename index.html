@@ -170,6 +170,12 @@ body{
   border:solid #fff;border-width:0 2px 2px 0;transform:rotate(43deg);
 }
 .check .nm{color:var(--ink);flex:1;min-width:0}
+.check.det-row{align-items:flex-start}
+.check.det-row .ic{margin-top:3px}
+.check .nm b{font-weight:500}
+.check .nm .why{display:block;font-size:12.5px;color:var(--ink4);margin-top:3px;line-height:1.45}
+.check .nm .why em{font-style:normal;color:var(--ink2)}
+.check.det-row .dur{margin-top:3px}
 .check .dur{font-family:var(--mono);font-size:11.5px;color:var(--ink4)}
 .check .det{font-size:12.5px;color:var(--ink4)}
 .gate{
@@ -511,7 +517,7 @@ body{
           <div class="checks" data-seq="check" data-delay="700">
             <div class="check"><span class="ic"></span><span class="nm">yamllint</span><span class="dur">6s</span></div>
             <div class="check"><span class="ic"></span><span class="nm">ansible-lint (production profile)</span><span class="dur">24s</span></div>
-            <div class="check"><span class="ic"></span><span class="nm">molecule — converge and idempotence</span><span class="dur">2m 11s</span></div>
+            <div class="check det-row"><span class="ic"></span><span class="nm"><b>Molecule</b><span class="why">stands up a throwaway host, applies the role, then applies it <em>again</em> — and fails if the second run changes anything</span></span><span class="dur">2m 11s</span></div>
             <div class="check"><span class="ic"></span><span class="nm">execution environment parity</span><span class="dur">9s</span></div>
           </div>
           <div class="gate">
@@ -673,7 +679,8 @@ body{
       </div>
       <div class="captext" data-cap="3">
         <h2>The pull request is where the machine checks happen</h2>
-        <p class="body">Four automated gates run before any human is asked for an opinion: syntax, lint at production profile, a molecule run that converges the role and then proves it is idempotent, and a check that the execution environment matches.</p>
+        <p class="body">Four automated gates run before any human is asked for an opinion: syntax, lint at production profile, a <strong>Molecule</strong> run, and a check that the execution environment matches.</p>
+        <p class="body">Molecule is the one that tests behavior rather than text. ansible-lint reads a playbook; Molecule runs it, twice, and fails the check if the second run reports a change. That is the only automatic way to catch a task that claims "changed" forever — the defect that buries real changes in noise and quietly makes <code>--check</code> worthless.</p>
         <p class="body">Merging is blocked, and not by policy or good intentions. The branch protection rule will not let it through.</p>
       </div>
       <div class="captext" data-cap="4">
@@ -872,8 +879,8 @@ body{
       lines:EXT, unit:4, reveal:90, pos:'Ln 1, Col 1', sp:'Spaces: 4', lang:'{ } JSON with Comments' },
     play: { title:'playbook.yml',
       tree:[[0,'open','(WORKSPACE)','sec'],[0,'open','ansible-devspaces-demo'],[1,'dir','.vscode'],
-            [1,'dir','cloud'],[1,'dir','collections'],[1,'dir','network'],[1,'dir','platforms'],[1,'dir','roles'],
-            [1,'open','storage'],[2,'yaml','playbook.yml','sel'],[1,'dot','.ansible-lint'],
+            [1,'dir','cloud'],[1,'dir','collections'],[1,'dir','database'],[1,'dir','linux'],[1,'dir','network'],[1,'dir','roles'],
+            [1,'open','storage'],[2,'yaml','playbook.yml','sel'],[1,'dir','windows'],[1,'dot','.ansible-lint'],
             [1,'yaml','devfile.yaml'],[1,'md','README.md']],
       tabs:[{k:'json',n:'extensions.json'},{k:'yaml',n:'playbook.yml',on:1}],
       crumbs:['ansible-devspaces-demo','storage',fic('yaml')+'playbook.yml','\u2026'],
