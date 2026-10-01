@@ -256,6 +256,11 @@ body{
 .caption .body + .body{margin-top:8px}
 .caption .body strong{color:var(--ink);font-weight:500}
 .caption .body code{font-family:var(--mono);font-size:12.5px;color:#f4b678}
+.caption .body a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--red);
+  text-decoration-thickness:1px;text-underline-offset:3px;transition:text-decoration-color .15s,color .15s}
+.caption .body a:hover{text-decoration-color:#ff4d4d}
+.caption .body a:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:2px}
+.caption .body a .ext{font-size:.82em;opacity:.65;margin-left:3px;text-decoration:none;display:inline-block}
 .captext{display:none}
 .captext.on{display:block}
 
@@ -520,7 +525,7 @@ body{
           </div>
           <div class="checks" data-seq="check" data-delay="700">
             <div class="check"><span class="ic"></span><span class="nm">yamllint</span><span class="dur">6s</span></div>
-            <div class="check"><span class="ic"></span><span class="nm">ansible-lint (production profile)</span><span class="dur">24s</span></div>
+            <div class="check det-row"><span class="ic"></span><span class="nm"><b>Ansible Lint</b><span class="why">checks the playbook against the production rule set — deprecated syntax, unqualified module names, unsafe permissions</span></span><span class="dur">24s</span></div>
             <div class="check det-row"><span class="ic"></span><span class="nm"><b>Molecule</b><span class="why">stands up a throwaway host, applies the role, then applies it <em>again</em> — and fails if the second run changes anything</span></span><span class="dur">2m 11s</span></div>
             <div class="check"><span class="ic"></span><span class="nm">execution environment parity</span><span class="dur">9s</span></div>
           </div>
@@ -677,15 +682,15 @@ body{
         <p class="body">The same <code>devfile.yaml</code> that built this workspace pins the execution environment image that Ansible Automation Platform will run with later. That is what closes the gap between here and production.</p>
       </div>
       <div class="captext" data-cap="2">
-        <h2>ansible-lint reviews the change before a person has to</h2>
-        <p class="body"><strong>What it does:</strong> checks the playbook against a rule set for deprecated syntax, unqualified module names, tasks that report "changed" on every run, shell commands where a real module exists, and files left with unsafe permissions. It runs on save in the workspace and again on commit.</p>
+        <h2>Ansible Lint reviews the change before a person has to</h2>
+        <p class="body"><strong>What it does:</strong> <a href="https://docs.ansible.com/projects/lint/" target="_blank" rel="noopener noreferrer">Ansible Lint</a> checks the playbook against a rule set for deprecated syntax, unqualified module names, tasks that report "changed" on every run, shell commands where a real module exists, and files left with unsafe permissions. It runs on save in the workspace and again on commit.</p>
         <p class="body"><strong>Why it matters here:</strong> it settles every style argument before review, so the reviewer spends their attention on whether the change is <strong>right</strong> rather than whether it is tidy. And it catches the class of defect that does not fail in test — the non-idempotent task that passes once, then quietly re-applies itself on every run afterward.</p>
         <p class="body">Because lint runs inside the same execution environment AAP uses, "passes here" genuinely means "parses there."</p>
       </div>
       <div class="captext" data-cap="3">
         <h2>The pull request is where the machine checks happen</h2>
-        <p class="body">Four automated gates run before any human is asked for an opinion: syntax, lint at production profile, a <strong>Molecule</strong> run, and a check that the execution environment matches.</p>
-        <p class="body">Molecule is the one that tests behavior rather than text. ansible-lint reads a playbook; Molecule runs it, twice, and fails the check if the second run reports a change. That is the only automatic way to catch a task that claims "changed" forever — the defect that buries real changes in noise and quietly makes <code>--check</code> worthless.</p>
+        <p class="body">Four automated gates run before any human is asked for an opinion: syntax, <strong>Ansible Lint</strong> at its production profile, a <strong><a href="https://docs.ansible.com/projects/molecule/" target="_blank" rel="noopener noreferrer">Molecule</a></strong> run, and a check that the execution environment matches.</p>
+        <p class="body">Molecule is the one that tests behavior rather than text. Ansible Lint reads a playbook; Molecule runs it, twice, and fails the check if the second run reports a change. That is the only automatic way to catch a task that claims "changed" forever — the defect that buries real changes in noise and quietly makes <code>--check</code> worthless.</p>
         <p class="body">Merging is blocked, and not by policy or good intentions. The branch protection rule will not let it through.</p>
       </div>
       <div class="captext" data-cap="4">
@@ -932,7 +937,7 @@ body{
         [6, y('mtu','9198','yn'), '', 10],
         [4, y('state','merged'), '', 11]
       ],
-      b:{ label:'Approve', src:'ansible-lint in the pull request', start:1500, rows:[
+      b:{ label:'Approve', src:'Ansible Lint in the pull request', start:1500, rows:[
         [P+'ansible-lint network/'+PE],
         [tag('fail','fqcn[action]')+note(': Use FQCN for module actions, such as cisco.ios.ios_interfaces.'), ' data-wait="700"'],
         ['network/uplinks.yml:6 '+note('Task/Handler: Merge uplink interface config')],
@@ -971,7 +976,7 @@ body{
         [4, S+'yk">state'+E+S+'yp">: '+E+S+'ys sq">latest'+E, 'v-bad', 10],
         [4, y('state','present'), 'v-good', 10]
       ],
-      b:{ label:'Approve', src:'ansible-lint in the pull request', start:1500, rows:[
+      b:{ label:'Approve', src:'Ansible Lint in the pull request', start:1500, rows:[
         [P+'ansible-lint linux/'+PE],
         [tag('fail','package-latest')+note(': Package installs should not use latest.'), ' data-wait="700"'],
         ['linux/patch_web.yml:8 '+note('Task/Handler: Update openssl')],
@@ -993,7 +998,7 @@ body{
         [tag('cmd','web-04')+note(' : ok=2  changed=1  failed=0')]
       ]},
       cap:{ h:'Linux: the version you tested is the version you ship', p:[
-        '<code>state: latest</code> is the most common way a fleet drifts. Test gets Tuesday\'s openssl, production gets Thursday\'s, and nobody approved the difference. ansible-lint flags it as <code>package-latest</code>; pinning the version makes what was tested exactly what ships.',
+        '<code>state: latest</code> is the most common way a fleet drifts. Test gets Tuesday\'s openssl, production gets Thursday\'s, and nobody approved the difference. Ansible Lint flags it as <code>package-latest</code>; pinning the version makes what was tested exactly what ships.',
         '<code>serial: 25%</code> with <code>max_fail_percentage: 0</code> patches a quarter of the tier at a time and stops at the first failure, so a bad package takes out one batch instead of the whole tier.' ]}
     },
     { key:'windows', title:'Windows', dir:'/windows/', owner:'@windows-platform', file:'windows/iis.yml',

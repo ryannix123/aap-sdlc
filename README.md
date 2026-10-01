@@ -6,7 +6,7 @@ OpenShift Dev Spaces workspace to production through Ansible Automation Platform
 The main story follows one storage change through eight steps:
 
 1. **Write** — open the workspace, write the playbook, lint before commit
-2. **Approve** — pull request checks (yamllint, ansible-lint, Molecule, execution
+2. **Approve** — pull request checks (yamllint, Ansible Lint, Molecule, execution
    environment parity), then CODEOWNERS review by the owning team
 3. **Run** — `--check` first, then apply, and the same path for every team
 
@@ -16,7 +16,7 @@ Two optional appendices follow.
 teaching something different:
 
 - **Network** — check mode returns the exact CLI lines a resource module would send
-- **Linux** — `package-latest` and rolling updates with `serial`
+- **Linux** — Ansible Lint rule `package-latest`, and rolling updates with `serial`
 - **Windows** — Molecule's idempotence test catches a shell one-liner
 - **Cloud** — push protection blocks a pasted key; AAP injects credentials at run time
 - **Database** — where check mode can't help: pre-flight analysis, backup, approval node, restore path
