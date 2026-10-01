@@ -489,6 +489,10 @@ body{
       <button class="substep" data-go="11">Cloud</button>
       <button class="substep" data-go="12">Database</button>
     </div>
+    <div class="stage-group" data-stage="5">
+      <div class="stage-head"><span class="n">+</span> Go deeper</div>
+      <button class="substep" data-go="13">Inside a Molecule run</button>
+    </div>
   </nav>
 
   <div class="main">
@@ -647,6 +651,7 @@ body{
       <section class="panel dom-panel" id="p10"><div data-dom="windows"></div></section>
       <section class="panel dom-panel" id="p11"><div data-dom="cloud"></div></section>
       <section class="panel dom-panel" id="p12"><div data-dom="database"></div></section>
+      <section class="panel dom-panel" id="p13"><div data-deep="molecule"></div></section>
 
       <!-- 8 : network -->
 
@@ -1003,7 +1008,7 @@ body{
         [4, y('state','present'), 'v-good', 7],
         [4, y('include_management_tools','true','yb'), 'v-good', 8]
       ],
-      b:{ label:'Approve', src:'molecule in the pull request', start:1500, rows:[
+      b:{ label:'Approve', src:'Molecule in the pull request', start:1500, rows:[
         [P+'molecule test -s windows'+PE],
         [note('converge    ................ ')+tag('pass','ok'), ' data-wait="700"'],
         [note('idempotence ................ ')+tag('fail','FAILED'), ' data-wait="500"'],
@@ -1142,8 +1147,84 @@ body{
     capBox.insertAdjacentHTML('beforeend','<div class="captext" data-cap="'+(8+di)+'"><h2>'+dd.cap.h+'</h2>'+ph+'</div>');
   }
 
+  /* ---------------- deeper: inside a Molecule run ---------------- */
+  var MOL = [
+    [0, S+'yp">---'+E],
+    [0, S+'yk">driver'+E+S+'yp">:'+E],
+    [1, y('name','default')+'   '+S+'c"># delegated: Ansible builds the host'+E],
+    [0, S+'yk">platforms'+E+S+'yp">:'+E],
+    [1, yd('name','instance')],
+    [0, S+'yk">provisioner'+E+S+'yp">:'+E],
+    [1, y('name','ansible')],
+    [0, S+'yk">verifier'+E+S+'yp">:'+E],
+    [1, y('name','ansible')],
+    [0, S+'yk">scenario'+E+S+'yp">:'+E],
+    [1, S+'yk">test_sequence'+E+S+'yp">:'+E],
+    [2, S+'yp">- '+E+S+'ys">create'+E],
+    [2, S+'yp">- '+E+S+'ys">converge'+E],
+    [2, S+'yp">- '+E+S+'ys">idempotence'+E],
+    [2, S+'yp">- '+E+S+'ys">verify'+E],
+    [2, S+'yp">- '+E+S+'ys">destroy'+E]
+  ];
+  var VER = [
+    [0, S+'yp">---'+E],
+    [0, yd('name','Verify')],
+    [1, y('hosts','all')],
+    [1, S+'yk">tasks'+E+S+'yp">:'+E],
+    [2, yd('name','Volume is online and exported')],
+    [3, S+'yk">ansible.builtin.assert'+E+S+'yp">:'+E],
+    [4, S+'yk">that'+E+S+'yp">:'+E],
+    [5, S+'yp">- '+E+S+'ys">result.state == "online"'+E],
+    [5, S+'yp">- '+E+S+'ys">result.export_policy == "prod"'+E],
+    [4, y('fail_msg','the role ran, but the end state is wrong')]
+  ];
+  var MOLROWS = [
+    [P+'molecule test'+PE],
+    [note('INFO   default > create')],
+    [tag('warn','       changed: [instance]')+note('    a throwaway host, built for this test')],
+    [note('INFO   default > converge')],
+    [tag('warn','       changed: [instance]')+note('    ok=7  changed=3')],
+    [note('INFO   default > idempotence')],
+    [tag('pass','       ok: [instance]')+note('         ok=7  ')+tag('pass','changed=0')+note('   <- the gate')],
+    [note('INFO   default > verify')],
+    [tag('pass','       ok: [instance]')+note('         3 assertions passed')],
+    [note('INFO   default > destroy')],
+    [tag('warn','       changed: [instance]')+note('    nothing left behind')],
+    [''],
+    [tag('pass','Scenario default: all steps passed.')]
+  ];
+  var deepHost = document.querySelector('[data-deep="molecule"]');
+  if (deepHost){
+    deepHost.outerHTML =
+      '<div class="dom"><div class="dom-head"><h3>Inside a Molecule run</h3>'+
+      '<span class="meta">build a host, apply the role, apply it again, check the result, throw the host away</span></div>'+
+      '<div class="dom-grid">'+
+      card('c-write','Configure', fic('yaml')+'molecule/default/molecule.yml',
+           '<pre class="code reveal" data-delay="70">'+codeLines(MOL,2)+'</pre>')+
+      card('c-b','Run','molecule test',
+           '<div class="term" data-seq="row" data-delay="200" data-start="1300">'+rows(MOLROWS)+'</div>')+
+      card('c-c','Verify', fic('yaml')+'molecule/default/verify.yml',
+           '<pre class="code">'+codeLines(VER,2)+'</pre>')+
+      '</div></div>';
+  }
+  capBox.insertAdjacentHTML('beforeend',
+    '<div class="captext" data-cap="13">'+
+    '<h2>Molecule proves the role works, not just that it ran</h2>'+
+    '<p class="body"><strong>What it is:</strong> a test harness for Ansible content. It builds a disposable host, '+
+    'applies the role to it, and destroys it afterward — so every test starts from the same place and leaves nothing behind. '+
+    'Under Ansible Automation Platform the delegated driver is the one that ships, which means Ansible itself builds the '+
+    'test host. There is no second tool for the team to learn.</p>'+
+    '<p class="body"><strong>What it proves,</strong> in three steps nothing else in the chain can. <em>Converge</em>: the role '+
+    'runs clean on a host that has never seen it. <em>Idempotence</em>: a second run changes nothing. <em>Verify</em>: assertions '+
+    'about the end state, so "the play succeeded" and "the result is correct" stop being treated as the same claim.</p>'+
+    '<p class="body"><strong>Why it beats the alternative:</strong> without it, someone tests by hand on a shared dev box, '+
+    'remembers to run it twice, and tells you it works. Molecule does the same thing the same way every time, inside the pull '+
+    'request, with the evidence attached to the change. It is the slowest and most expensive gate here — which is exactly why '+
+    'it is the one that means something.</p>'+
+    '</div>');
+
   /* ---------------- step engine ---------------- */
-  var TOTAL = 13, MAIN = 8, cur = -1, timers = [];
+  var TOTAL = 14, MAIN = 8, DOMS = 13, cur = -1, timers = [];
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var panels = [];
   for (var i = 0; i < TOTAL; i++) panels.push(document.getElementById('p' + i));
@@ -1254,14 +1335,14 @@ body{
       subs[i].classList.toggle('done', i < cur);
     }
     var groups = document.querySelectorAll('.stage-group');
-    var stage = cur <= 2 ? 1 : (cur <= 4 ? 2 : (cur <= 7 ? 3 : 4));
+    var stage = cur <= 2 ? 1 : (cur <= 4 ? 2 : (cur <= 7 ? 3 : (cur < DOMS ? 4 : 5)));
     for (var g = 0; g < groups.length; g++)
       groups[g].classList.toggle('on', parseInt(groups[g].getAttribute('data-stage'), 10) === stage);
-    document.getElementById('count').textContent = cur < MAIN ? (cur + 1) + ' / ' + MAIN : 'Domain ' + (cur - MAIN + 1) + ' of ' + (TOTAL - MAIN);
+    document.getElementById('count').textContent = cur < MAIN ? (cur + 1) + ' / ' + MAIN : (cur < DOMS ? 'Domain ' + (cur - MAIN + 1) + ' of ' + (DOMS - MAIN) : 'Deeper');
     document.getElementById('prev').disabled = (cur === 0);
     var nx = document.getElementById('next');
     nx.disabled = (cur === TOTAL - 1);
-    nx.textContent = (cur === MAIN - 1) ? 'Explore by domain' : ((cur === TOTAL - 1) ? 'End' : 'Next');
+    nx.textContent = (cur === MAIN - 1) ? 'Explore by domain' : ((cur === DOMS - 1) ? 'Go deeper' : ((cur === TOTAL - 1) ? 'End' : 'Next'));
   }
 
   for (var s = 0; s < subs.length; s++){
